@@ -1,10 +1,27 @@
 
+import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "@/components/ui/card";
 import { AuthForm } from "@/components/AuthForm";
-import { Bike, Heart, Yoga } from "lucide-react";
+import { Bike, Heart, Leaf } from "lucide-react";
+import SplashScreen from "@/components/SplashScreen";
 
 export default function Index() {
+  const [showSplash, setShowSplash] = useState(true);
+
+  useEffect(() => {
+    // Hide splash screen after 3 seconds
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-[#FDF8F4] to-[#F5E6E0]">
       <div className="w-full max-w-lg space-y-8 animate-fade-in">
@@ -12,7 +29,7 @@ export default function Index() {
           <div className="flex justify-center space-x-2 mb-6">
             <Heart className="h-8 w-8 text-[#FEC6A1]" />
             <Bike className="h-8 w-8 text-[#7FB069]" />
-            <Yoga className="h-8 w-8 text-[#FEC6A1]" />
+            <Leaf className="h-8 w-8 text-[#FEC6A1]" />
           </div>
           <h1 className="text-4xl font-semibold text-[#2D3047]">
             Welcome to Anuvruddhi
