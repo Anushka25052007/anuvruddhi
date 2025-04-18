@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import { Mail, Lock } from "lucide-react";
+import { LocationForm } from "./LocationForm";
 
 interface AuthFormProps {
   type: "signin" | "signup";
@@ -13,6 +14,7 @@ interface AuthFormProps {
 export function AuthForm({ type }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showLocationForm, setShowLocationForm] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -23,7 +25,28 @@ export function AuthForm({ type }: AuthFormProps) {
         ? "Great to see you again" 
         : "Welcome to Anuvruddhi. Your wellness journey begins now.",
     });
+    
+    // Show location form after successful authentication
+    setShowLocationForm(true);
   };
+  
+  const handleLocationComplete = (locationData: {
+    address: string;
+    country: string;
+    coordinates: { lat: number; lng: number } | null;
+  }) => {
+    // In a real app, you would save this data to the user profile
+    console.log("Location data:", locationData);
+    
+    toast({
+      title: "Setup complete!",
+      description: "Your profile has been updated with your location information.",
+    });
+  };
+
+  if (showLocationForm) {
+    return <LocationForm onComplete={handleLocationComplete} />;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 relative">
