@@ -26,7 +26,17 @@ export function AuthForm({ type }: AuthFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 relative">
+      {type === "signup" && (
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/lovable-uploads/3158e028-c2f1-420e-b641-125bd0919615.png" 
+            alt="Healthy Lifestyle" 
+            className="w-64 h-64 object-contain animate-fade-in"
+          />
+        </div>
+      )}
+      
       <div className="space-y-2">
         <Label htmlFor="email">Email</Label>
         <div className="relative">
