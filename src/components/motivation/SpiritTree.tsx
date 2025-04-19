@@ -1,7 +1,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { Tree } from "lucide-react";
+import { Trees } from "lucide-react";
 
 interface SpiritTreeProps {
   progress: number;
@@ -22,7 +22,7 @@ export function SpiritTree({ progress }: SpiritTreeProps) {
         }}
         className="relative"
       >
-        <Tree
+        <Trees
           className="h-24 w-24 text-[#7FB069]"
           style={{
             filter: `brightness(${100 + progress * 50}%)`,

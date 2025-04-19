@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card } from "@/components/ui/card";
-import { Droplet, Wind, Tree, Clock, Sparkles } from "lucide-react";
+import { Droplet, Wind, Trees, Clock, Sparkles } from "lucide-react";
 import { TaskTile } from "@/components/motivation/TaskTile";
 import { SpiritTree } from "@/components/motivation/SpiritTree";
 import { ParticleEffect } from "@/components/motivation/ParticleEffect";
@@ -26,7 +26,7 @@ const challenges = [
   {
     id: 3,
     title: "Connect with Nature",
-    icon: Tree,
+    icon: Trees,
     duration: "10 minutes",
     points: 20,
   },
