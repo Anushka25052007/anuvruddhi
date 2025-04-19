@@ -15,16 +15,29 @@ export function AuthForm({ type }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showLocationForm, setShowLocationForm] = useState(false);
+  const [showStartJourney, setShowStartJourney] = useState(false);
   const { toast } = useToast();
 
+  // Mock user authentication - in a real app, this would use Firebase Auth
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Mock successful authentication
+    const mockUID = `user_${Date.now().toString(36)}`;
+    
     toast({
       title: type === "signin" ? "Welcome back!" : "Account created!",
       description: type === "signin" 
         ? "Great to see you again" 
         : "Welcome to Anuvruddhi. Your wellness journey begins now.",
     });
+    
+    // In a real app, we would get the actual user data from Firebase
+    // Store mock auth data in sessionStorage for demo purposes
+    sessionStorage.setItem("authUser", JSON.stringify({
+      email,
+      uid: mockUID
+    }));
     
     // Show location form after successful authentication
     setShowLocationForm(true);
@@ -42,7 +55,47 @@ export function AuthForm({ type }: AuthFormProps) {
       title: "Setup complete!",
       description: "Your profile has been updated with your location information.",
     });
+    
+    // Show the Start Journey button
+    setShowStartJourney(true);
   };
+
+  const redirectToPartTwo = () => {
+    // Get the user data from sessionStorage
+    const authUserStr = sessionStorage.getItem("authUser");
+    if (!authUserStr) {
+      toast({
+        title: "Authentication error",
+        description: "Please try logging in again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const authUser = JSON.parse(authUserStr);
+    const { email, uid } = authUser;
+
+    // Build the URL with query parameters
+    const part2URL = `https://lovable.dev/projects/c04dd057-1545-4481-9842-e874d2ca8037?email=${encodeURIComponent(email)}&uid=${encodeURIComponent(uid)}`;
+    
+    // Redirect to Part 2
+    window.location.href = part2URL;
+  };
+
+  if (showStartJourney) {
+    return (
+      <div className="space-y-6 text-center">
+        <h2 className="text-2xl font-semibold">Ready to Begin Your Journey?</h2>
+        <p className="text-gray-600">Your profile is all set up. Click the button below to start your wellness journey.</p>
+        <Button 
+          onClick={redirectToPartTwo}
+          className="w-full bg-[#7FB069] hover:bg-[#6A9957] transition-colors text-lg py-6"
+        >
+          Start Your Journey
+        </Button>
+      </div>
+    );
+  }
 
   if (showLocationForm) {
     return <LocationForm onComplete={handleLocationComplete} />;
