@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MotivationArena from "./pages/MotivationArena";
 import DailyWheel from "./pages/DailyWheel";
+import HabitGarden from "./pages/HabitGarden";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +22,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/arena" element={<MotivationArena />} />
           <Route path="/wheel" element={<DailyWheel />} />
+          <Route path="/habits" element={<HabitGarden />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
