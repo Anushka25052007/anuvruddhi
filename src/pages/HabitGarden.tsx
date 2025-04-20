@@ -9,13 +9,19 @@ import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { ChainReactionPopup } from "@/components/habits/ChainReactionPopup";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { InfoIcon, Award, Trophy } from "lucide-react";
+import { InfoIcon, Award, Trophy, BookOpen, Dumbbell, Timer, Music } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const defaultHabits = [
   { id: 1, name: "Wake Up Early", streak: 0, type: "sunrise", xp: 10 },
   { id: 2, name: "Mindful Eating", streak: 0, type: "leaf", xp: 15 },
   { id: 3, name: "Gratitude Journal", streak: 0, type: "flower", xp: 12 },
   { id: 4, name: "Meditation", streak: 0, type: "lotus", xp: 20 },
+  { id: 5, name: "Study Session", streak: 0, type: "study", xp: 18 },
+  { id: 6, name: "Exercise Routine", streak: 0, type: "exercise", xp: 16 },
+  { id: 7, name: "Focus Timer", streak: 0, type: "timer", xp: 14 },
+  { id: 8, name: "Music Practice", streak: 0, type: "music", xp: 15 },
 ];
 
 const motivationalQuotes = [
@@ -244,9 +250,20 @@ export default function HabitGarden() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-8"
         >
-          <h1 className="text-3xl font-bold text-[#2D3047] mb-2">
-            Your Habit Garden
-          </h1>
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-[#2D3047] mb-2">
+              Your Habit Garden
+            </h1>
+            <Link to="/certificates">
+              <Button 
+                variant="outline" 
+                className="bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white border-none hover:opacity-90"
+              >
+                <Award className="mr-2 h-4 w-4" />
+                Certificates
+              </Button>
+            </Link>
+          </div>
           <p className="text-[#8E9196] mb-4">Watch your habits grow into beautiful plants</p>
           
           {/* XP Display with Tooltip */}
@@ -352,13 +369,18 @@ export default function HabitGarden() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <Card className="p-6 bg-white/80 backdrop-blur-sm">
-            <h2 className="text-xl font-semibold text-[#2D3047] mb-4">Daily Rituals</h2>
+            <h2 className="text-xl font-semibold text-[#2D3047] mb-4 flex items-center">
+              <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-[#8B5CF6] to-[#D946EF] mr-2">
+                <Trophy className="h-4 w-4 text-white" />
+              </div>
+              Daily Rituals
+            </h2>
             <DailyRitualCircle />
           </Card>
 
           <div className="space-y-4">
-            <AnimatePresence>
-              {habits.map((habit) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {habits.slice(0, 4).map((habit) => (
                 <motion.div
                   key={habit.id}
                   initial={{ opacity: 0, x: -20 }}
@@ -376,7 +398,28 @@ export default function HabitGarden() {
                   />
                 </motion.div>
               ))}
-            </AnimatePresence>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {habits.slice(4).map((habit) => (
+                <motion.div
+                  key={habit.id}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ delay: habit.id * 0.1 }}
+                >
+                  <HabitPlant
+                    habit={{
+                      ...habit,
+                      // Display adjusted XP value based on level
+                      xp: Math.round(habit.xp * getXpMultiplier(totalXp))
+                    }}
+                    onComplete={() => updateStreak(habit.id)}
+                  />
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import MotivationArena from "./pages/MotivationArena";
 import DailyWheel from "./pages/DailyWheel";
 import HabitGarden from "./pages/HabitGarden";
+import Certificates from "./pages/Certificates";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/arena" element={<MotivationArena />} />
           <Route path="/wheel" element={<DailyWheel />} />
           <Route path="/habits" element={<HabitGarden />} />
+          <Route path="/certificates" element={<Certificates />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

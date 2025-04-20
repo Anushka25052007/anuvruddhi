@@ -62,11 +62,29 @@ export default {
         "pulse-glow": {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.6" }
+        },
+        "twinkle": {
+          "0%, 100%": { opacity: "0.1" },
+          "50%": { opacity: "1" }
+        },
+        "shine": {
+          "0%": { backgroundPosition: "200% center" },
+          "100%": { backgroundPosition: "-200% center" }
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" }
         }
       },
       animation: {
         "fade-in": "fade-in 0.5s ease-out forwards",
         "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        "twinkle": "twinkle 3s infinite ease-in-out",
+        "shine": "shine 3s linear infinite",
+        "float": "float 6s ease-in-out infinite"
+      },
+      backgroundImage: {
+        "certificate-pattern": "url('/lovable-uploads/a1f630c9-1610-45af-8613-37fe87fdfb8b.png')"
       },
     },
   },
