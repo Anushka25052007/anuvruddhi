@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { toast } from "@/hooks/use-toast";
@@ -9,7 +9,7 @@ import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { ChainReactionPopup } from "@/components/habits/ChainReactionPopup";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon, Award, Trophy } from "lucide-react";
 
 const defaultHabits = [
   { id: 1, name: "Wake Up Early", streak: 0, type: "sunrise", xp: 10 },
@@ -25,6 +25,14 @@ const motivationalQuotes = [
   "You're creating a garden of positive change!",
 ];
 
+// Milestone special tasks for approaching XP thresholds
+const momentumBoostTasks = [
+  { name: "Deep Breathing Session", xp: 20 },
+  { name: "Write a Reflection", xp: 20 },
+  { name: "Mindful Walking", xp: 20 },
+  { name: "Five Minutes of Gratitude", xp: 20 },
+];
+
 export default function HabitGarden() {
   const [habits, setHabits] = useState(defaultHabits);
   const [lastCompletedId, setLastCompletedId] = useState<number | null>(null);
@@ -32,6 +40,10 @@ export default function HabitGarden() {
   const [totalXp, setTotalXp] = useState(0);
   const [showLevelUpMessage, setShowLevelUpMessage] = useState(false);
   const [previousXpTier, setPreviousXpTier] = useState(0);
+  const [showMilestoneApproaching, setShowMilestoneApproaching] = useState(false);
+  const [specialTask, setSpecialTask] = useState(momentumBoostTasks[0]);
+  const [milestoneGlowing, setMilestoneGlowing] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const getRandomQuote = () => {
     return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
@@ -62,6 +74,80 @@ export default function HabitGarden() {
       case 2: return "Master Gardener";
       default: return "Gardener";
     }
+  };
+
+  // Calculate next milestone based on XP
+  const getNextMilestone = (xp: number) => {
+    if (xp < 100) return 100;
+    if (xp < 200) return 200;
+    return Math.ceil(xp / 100) * 100;
+  };
+
+  // Check if approaching milestone (80% towards next milestone)
+  const isApproachingMilestone = (xp: number) => {
+    const nextMilestone = getNextMilestone(xp);
+    const previousMilestone = nextMilestone - 100;
+    const threshold = previousMilestone + 80; // 80% of the way
+    return xp >= threshold && xp < nextMilestone;
+  };
+
+  // Get a random special task for milestone boost
+  const getRandomSpecialTask = () => {
+    return momentumBoostTasks[Math.floor(Math.random() * momentumBoostTasks.length)];
+  };
+
+  // Check milestone approach on XP changes
+  useEffect(() => {
+    const approaching = isApproachingMilestone(totalXp);
+    
+    if (approaching && !showMilestoneApproaching) {
+      setShowMilestoneApproaching(true);
+      setSpecialTask(getRandomSpecialTask());
+      setMilestoneGlowing(true);
+      
+      toast({
+        title: "🌟 You're almost there!",
+        description: `Complete a special task for extra XP: ${specialTask.name}`,
+        duration: 5000,
+      });
+    } else if (!approaching) {
+      setShowMilestoneApproaching(false);
+      setMilestoneGlowing(false);
+    }
+  }, [totalXp]);
+
+  // Check for milestone achievement
+  useEffect(() => {
+    const currentTier = getCurrentXpTier(totalXp);
+    const previousTier = getCurrentXpTier(totalXp - 1);
+    
+    if (currentTier > previousTier) {
+      setShowConfetti(true);
+      
+      toast({
+        title: "🏆 Milestone Achieved!",
+        description: "You've reached a new level of growth!",
+        duration: 5000,
+      });
+      
+      setTimeout(() => {
+        setShowConfetti(false);
+      }, 3000);
+    }
+  }, [totalXp]);
+
+  const completeSpecialTask = () => {
+    // Apply the special task XP
+    setTotalXp(prev => prev + specialTask.xp);
+    
+    toast({
+      title: "✨ Momentum Boost!",
+      description: `You gained +${specialTask.xp}XP from completing ${specialTask.name}!`,
+      duration: 3000,
+    });
+    
+    // Get a new special task for next time
+    setSpecialTask(getRandomSpecialTask());
   };
 
   const updateStreak = useCallback((habitId: number) => {
@@ -136,6 +222,22 @@ export default function HabitGarden() {
     <div className="min-h-screen bg-gradient-to-br from-[#FDE1D3] to-[#E5DEFF] relative overflow-hidden">
       <ParticleEffect />
       
+      {showConfetti && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <div className="absolute inset-0 flex items-center justify-center">
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 1.2, opacity: 0 }}
+              className="text-4xl font-bold text-center text-[#7FB069]"
+            >
+              <Trophy className="h-20 w-20 text-[#F97316] mx-auto mb-4" />
+              You've reached a new level of growth!
+            </motion.div>
+          </div>
+        </div>
+      )}
+      
       <div className="container mx-auto px-4 py-8 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -175,9 +277,9 @@ export default function HabitGarden() {
                 </TooltipProvider>
               </div>
               <motion.div
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="text-[#7FB069] font-semibold"
+                animate={{ scale: milestoneGlowing ? [1, 1.1, 1] : 1 }}
+                transition={{ duration: 1, repeat: milestoneGlowing ? Infinity : 0 }}
+                className={`text-[#7FB069] font-semibold ${milestoneGlowing ? 'text-[#F97316]' : ''}`}
               >
                 Total XP: {totalXp}
               </motion.div>
@@ -187,7 +289,12 @@ export default function HabitGarden() {
             <div className="relative">
               <Progress 
                 value={getProgressPercentage(totalXp)}
-                className="h-3 bg-[#E5DEFF]"
+                className={`h-3 bg-[#E5DEFF] ${milestoneGlowing ? 'animate-pulse' : ''}`}
+              />
+              <motion.div 
+                className={`absolute top-0 left-0 right-0 bottom-0 rounded-full ${milestoneGlowing ? 'bg-[#F97316]/20' : 'bg-transparent'}`}
+                animate={{ opacity: milestoneGlowing ? [0, 0.5, 0] : 0 }}
+                transition={{ duration: 2, repeat: Infinity }}
               />
               <div className="absolute top-0 left-0 right-0 h-full flex justify-between items-center px-2 pointer-events-none">
                 <div className={`text-xs font-medium ${currentTier > 0 ? 'text-[#7FB069]' : 'text-gray-500'}`}>0</div>
@@ -196,6 +303,37 @@ export default function HabitGarden() {
               </div>
             </div>
           </div>
+
+          {/* Special Task for Milestone Approach */}
+          <AnimatePresence>
+            {showMilestoneApproaching && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-md mx-auto mb-4 bg-gradient-to-r from-[#F97316]/30 to-[#FBBF24]/30 rounded-lg p-4 border border-[#F97316]/50 shadow-lg"
+              >
+                <div className="flex items-center mb-2">
+                  <Award className="h-5 w-5 text-[#F97316] mr-2" />
+                  <h3 className="font-bold text-[#2D3047]">You're almost there!</h3>
+                </div>
+                
+                <p className="text-sm text-[#2D3047] mb-3">
+                  Complete this special task for a momentum boost:
+                </p>
+                
+                <div className="flex items-center justify-between bg-white/50 p-3 rounded-md">
+                  <span className="font-medium">{specialTask.name}</span>
+                  <button 
+                    onClick={completeSpecialTask}
+                    className="px-3 py-1 bg-[#F97316] hover:bg-[#F97316]/80 text-white rounded-full text-sm font-medium"
+                  >
+                    +{specialTask.xp} XP
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Level Up Message */}
           <AnimatePresence>
