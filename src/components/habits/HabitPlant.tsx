@@ -1,3 +1,4 @@
+
 import React from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -10,6 +11,7 @@ interface HabitPlantProps {
     name: string;
     streak: number;
     type: string;
+    xp: number;
   };
   onComplete: () => void;
 }
@@ -67,13 +69,18 @@ export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
             <h3 className="font-semibold text-lg text-[#2D3047]">
               {habit.name}
             </h3>
-            <div className="flex items-center space-x-2">
-              <motion.div
-                className={`h-1 rounded-full bg-[#7FB069] transition-all`}
-                style={{ width: `${Math.min(habit.streak * 14, 100)}%` }}
-              />
-              <span className="text-sm text-[#8E9196]">
-                {habit.streak} day{habit.streak !== 1 ? "s" : ""}
+            <div className="flex items-center gap-4">
+              <div className="flex-1 flex items-center space-x-2">
+                <motion.div
+                  className="h-1 rounded-full bg-[#7FB069] transition-all"
+                  style={{ width: `${Math.min(habit.streak * 14, 100)}%` }}
+                />
+                <span className="text-sm text-[#8E9196]">
+                  {habit.streak} day{habit.streak !== 1 ? "s" : ""}
+                </span>
+              </div>
+              <span className="text-sm font-medium text-[#7FB069]">
+                +{habit.xp} XP
               </span>
             </div>
           </div>
