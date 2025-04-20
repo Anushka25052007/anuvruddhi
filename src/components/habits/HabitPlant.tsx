@@ -1,9 +1,8 @@
-
 import React from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Flower2, Sun, Leaf, Lotus } from "lucide-react";
+import { Flower2, Sun, Leaf } from "lucide-react";
 
 interface HabitPlantProps {
   habit: {
@@ -32,7 +31,7 @@ export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
       case "flower":
         return Flower2;
       case "lotus":
-        return Lotus;
+        return Flower2;
       default:
         return Leaf;
     }
