@@ -7,6 +7,9 @@ import { ParticleEffect } from "@/components/motivation/ParticleEffect";
 import { HabitPlant } from "@/components/habits/HabitPlant";
 import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { ChainReactionPopup } from "@/components/habits/ChainReactionPopup";
+import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoIcon } from "lucide-react";
 
 const defaultHabits = [
   { id: 1, name: "Wake Up Early", streak: 0, type: "sunrise", xp: 10 },
@@ -27,9 +30,38 @@ export default function HabitGarden() {
   const [lastCompletedId, setLastCompletedId] = useState<number | null>(null);
   const [showChainReaction, setShowChainReaction] = useState(false);
   const [totalXp, setTotalXp] = useState(0);
+  const [showLevelUpMessage, setShowLevelUpMessage] = useState(false);
+  const [previousXpTier, setPreviousXpTier] = useState(0);
 
   const getRandomQuote = () => {
     return motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+  };
+
+  const getXpMultiplier = (xp: number) => {
+    if (xp >= 200) return 0.2; // 20% of original XP value
+    if (xp >= 100) return 0.5; // 50% of original XP value
+    return 1; // Full XP value
+  };
+
+  const getCurrentXpTier = (xp: number) => {
+    if (xp >= 200) return 2;
+    if (xp >= 100) return 1;
+    return 0;
+  };
+
+  const getProgressPercentage = (xp: number) => {
+    if (xp >= 200) return ((xp - 200) / 200) * 100;
+    if (xp >= 100) return ((xp - 100) / 100) * 100;
+    return (xp / 100) * 100;
+  };
+
+  const getTierMessage = (tier: number) => {
+    switch (tier) {
+      case 0: return "Beginner Gardener";
+      case 1: return "Growing Gardener";
+      case 2: return "Master Gardener";
+      default: return "Gardener";
+    }
   };
 
   const updateStreak = useCallback((habitId: number) => {
@@ -40,7 +72,31 @@ export default function HabitGarden() {
     // Check for chain reaction
     const isChainReaction = lastCompletedId !== null && lastCompletedId !== habitId;
     const bonusXp = isChainReaction ? 20 : 0;
-    const totalEarnedXp = currentHabit.xp + bonusXp;
+    
+    // Apply XP multiplier based on current total XP
+    const multiplier = getXpMultiplier(totalXp);
+    const baseXp = Math.round(currentHabit.xp * multiplier);
+    const totalEarnedXp = baseXp + bonusXp;
+
+    const currentTier = getCurrentXpTier(totalXp);
+    const newTotalXp = totalXp + totalEarnedXp;
+    const newTier = getCurrentXpTier(newTotalXp);
+
+    // Check if user has moved to a new XP tier
+    if (newTier > currentTier) {
+      setPreviousXpTier(currentTier);
+      setShowLevelUpMessage(true);
+      toast({
+        title: "🌟 Level Up!",
+        description: `You're now a ${getTierMessage(newTier)}! Tasks will be more challenging but more rewarding!`,
+        duration: 5000,
+      });
+      
+      // Hide level up message after delay
+      setTimeout(() => {
+        setShowLevelUpMessage(false);
+      }, 5000);
+    }
 
     setHabits(habits.map(habit =>
       habit.id === habitId 
@@ -48,7 +104,7 @@ export default function HabitGarden() {
         : habit
     ));
 
-    setTotalXp(prev => prev + totalEarnedXp);
+    setTotalXp(newTotalXp);
     
     if (isChainReaction) {
       setShowChainReaction(true);
@@ -62,10 +118,19 @@ export default function HabitGarden() {
       setTimeout(() => {
         setShowChainReaction(false);
       }, 2000);
+    } else {
+      // Show regular XP toast when no chain reaction
+      toast({
+        title: "✅ Task Completed!",
+        description: `+${baseXp}XP earned${multiplier < 1 ? " (reduced due to your level)" : ""}`,
+        duration: 2000,
+      });
     }
 
     setLastCompletedId(habitId);
-  }, [habits, lastCompletedId]);
+  }, [habits, lastCompletedId, totalXp]);
+
+  const currentTier = getCurrentXpTier(totalXp);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FDE1D3] to-[#E5DEFF] relative overflow-hidden">
@@ -81,13 +146,70 @@ export default function HabitGarden() {
             Your Habit Garden
           </h1>
           <p className="text-[#8E9196] mb-4">Watch your habits grow into beautiful plants</p>
-          <motion.div
-            animate={{ scale: [1, 1.05, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-[#7FB069] font-semibold"
-          >
-            Total XP: {totalXp}
-          </motion.div>
+          
+          {/* XP Display with Tooltip */}
+          <div className="max-w-md mx-auto mb-4 bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-[#7FB069]/30">
+            <div className="flex justify-between items-center mb-2">
+              <div className="flex items-center">
+                <motion.div 
+                  animate={{ scale: [1, 1.05, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-[#7FB069] font-semibold mr-2"
+                >
+                  {getTierMessage(currentTier)}
+                </motion.div>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <InfoIcon className="h-4 w-4 text-[#7FB069]" />
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>As you level up, tasks become more challenging with reduced XP rewards:</p>
+                      <ul className="list-disc pl-4 mt-1">
+                        <li>Beginner (0-99 XP): Full rewards</li>
+                        <li>Growing (100-199 XP): 50% rewards</li>
+                        <li>Master (200+ XP): 20% rewards</li>
+                      </ul>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <motion.div
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="text-[#7FB069] font-semibold"
+              >
+                Total XP: {totalXp}
+              </motion.div>
+            </div>
+            
+            {/* XP Progress Bar */}
+            <div className="relative">
+              <Progress 
+                value={getProgressPercentage(totalXp)}
+                className="h-3 bg-[#E5DEFF]"
+              />
+              <div className="absolute top-0 left-0 right-0 h-full flex justify-between items-center px-2 pointer-events-none">
+                <div className={`text-xs font-medium ${currentTier > 0 ? 'text-[#7FB069]' : 'text-gray-500'}`}>0</div>
+                <div className={`text-xs font-medium ${currentTier > 1 ? 'text-[#7FB069]' : 'text-gray-500'}`}>100</div>
+                <div className="text-xs font-medium text-gray-500">200+</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Level Up Message */}
+          <AnimatePresence>
+            {showLevelUpMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                className="max-w-md mx-auto mb-4 bg-gradient-to-r from-[#8B5CF6] to-[#F97316] rounded-lg p-3 text-white font-medium"
+              >
+                You leveled up! Keep pushing yourself for greater challenges!
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
@@ -107,7 +229,11 @@ export default function HabitGarden() {
                   transition={{ delay: habit.id * 0.1 }}
                 >
                   <HabitPlant
-                    habit={habit}
+                    habit={{
+                      ...habit,
+                      // Display adjusted XP value based on level
+                      xp: Math.round(habit.xp * getXpMultiplier(totalXp))
+                    }}
                     onComplete={() => updateStreak(habit.id)}
                   />
                 </motion.div>
