@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,10 +23,21 @@ const baseFormSchema = z.object({
 });
 
 const greenSevakSchema = baseFormSchema.extend({
-  familyIncome: z.string().min(1, "Please provide your family income"),
-  familyMembers: z.string().min(1, "Please enter number of family members"),
+  familyIncome: z.string()
+    .refine(val => Number(val) <= 150000, {
+      message: "Family income must be less than ₹1.5 lakhs per annum"
+    }),
+  familyMembers: z.array(z.object({
+    fullName: z.string().min(2, "Full name must be at least 2 characters"),
+    relation: z.string().min(2, "Relation must be specified")
+  })).min(1, "At least one family member must be added"),
+  previousApplications: z.string()
+    .refine(val => val === "no", {
+      message: "Only one member per family can apply"
+    }),
   paymentMethod: z.string().min(1, "Please select a payment method"),
-  photoUrl: z.string().optional(),
+  photoUrl: z.string().min(1, "Photo upload is required"),
+  incomeProofUrl: z.string().min(1, "Income proof document is required")
 });
 
 const studentVolunteerSchema = baseFormSchema.extend({
@@ -36,6 +46,7 @@ const studentVolunteerSchema = baseFormSchema.extend({
   apaarId: z.string().min(1, "Please provide your APAAR ID"),
   collegeCity: z.string().min(2, "Please enter your college city"),
   previousMarksheetUrl: z.string().optional(),
+  currentYearProofUrl: z.string().optional(),
 });
 
 export function VolunteerForm() {
@@ -66,10 +77,22 @@ export function VolunteerForm() {
       phoneNo: "",
       email: "",
       familyIncome: "",
-      familyMembers: "",
+      familyMembers: [{ fullName: "", relation: "" }],
+      previousApplications: "no",
       paymentMethod: "",
     },
   });
+
+  const [familyMembers, setFamilyMembers] = useState([{ fullName: "", relation: "" }]);
+
+  const addFamilyMember = () => {
+    setFamilyMembers([...familyMembers, { fullName: "", relation: "" }]);
+  };
+
+  const removeFamilyMember = (index: number) => {
+    const newMembers = familyMembers.filter((_, i) => i !== index);
+    setFamilyMembers(newMembers);
+  };
 
   // Handle file upload (mock implementation)
   const handleFileUpload = (file: File, formType: "student" | "greenSevak", fieldName: string) => {
@@ -102,6 +125,15 @@ export function VolunteerForm() {
         toast({
           title: "Authentication required",
           description: "Please sign in to submit your application",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!data.previousMarksheetUrl || !data.currentYearProofUrl) {
+        toast({
+          title: "Missing Documents",
+          description: "Please upload all required documents",
           variant: "destructive",
         });
         return;
@@ -145,22 +177,21 @@ export function VolunteerForm() {
         });
         return;
       }
-      
-      // Save to Firebase
+
       await set(ref(database, `volunteers/greenSevaks/${user.uid}`), {
         ...data,
         submittedAt: new Date().toISOString(),
+        status: "pending_verification"
       });
       
-      // Send Telegram notification
       await sendTelegramNotification(`New Green Sevak application submitted by ${data.fullName}!`);
       
       toast({
         title: "Application submitted!",
-        description: "Your Green Sevak application has been received. We'll contact you soon.",
+        description: "Your application has been received. Our team will verify your details and contact you soon.",
+        duration: 6000,
       });
       
-      // Reset form
       greenSevakForm.reset();
       
     } catch (error: any) {
@@ -174,7 +205,11 @@ export function VolunteerForm() {
   };
 
   return (
-    <Card className="p-6 shadow-lg bg-gradient-to-br from-[#0F1D31] to-[#1A1F2C] text-white">
+    <Card className="p-6 shadow-lg bg-gradient-to-br from-[#0F1D31] to-[#1A1F2C] text-white relative overflow-hidden">
+      <div className="absolute inset-0 opacity-10">
+        <div className="w-full h-full bg-[url('/lovable-uploads/a1f630c9-1610-45af-8613-37fe87fdfb8b.png')] bg-cover bg-center" />
+      </div>
+      
       <div className="mb-6 text-center space-y-2">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-[#1EAEDB] to-[#9b87f5] bg-clip-text text-transparent">
           Volunteer Registration
@@ -311,18 +346,38 @@ export function VolunteerForm() {
                 />
               </div>
               
-              <div className="space-y-2">
-                <FormLabel>Previous Year Marksheet</FormLabel>
-                <Input
-                  type="file"
-                  accept=".pdf,.jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFileUpload(e.target.files[0], "student", "previousMarksheetUrl");
-                    }
-                  }}
-                  className="bg-[#252A3D] border-[#9b87f5]/30"
-                />
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Required Documents</h3>
+                
+                <div className="space-y-2">
+                  <FormLabel>Previous Year Marksheet</FormLabel>
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], "student", "previousMarksheetUrl");
+                      }
+                    }}
+                    className="bg-[#252A3D] border-[#9b87f5]/30"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Current Year Learning Proof</FormLabel>
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], "student", "currentYearProofUrl");
+                      }
+                    }}
+                    className="bg-[#252A3D] border-[#9b87f5]/30"
+                  />
+                </div>
               </div>
               
               <Button 
@@ -339,6 +394,16 @@ export function VolunteerForm() {
         <TabsContent value="greenSevak" className="space-y-6">
           <Form {...greenSevakForm}>
             <form onSubmit={greenSevakForm.handleSubmit(onSubmitGreenSevak)} className="space-y-6">
+              <div className="bg-[#252A3D]/50 p-4 rounded-lg mb-6">
+                <h3 className="font-semibold text-[#E2D1C3] mb-2">Eligibility Criteria:</h3>
+                <ul className="list-disc list-inside text-sm text-[#9F9EA1] space-y-1">
+                  <li>Family income must be less than ₹1.5 lakhs per annum</li>
+                  <li>Only one member per family can apply</li>
+                  <li>Must provide income proof documentation</li>
+                  <li>Must provide a recent photograph</li>
+                </ul>
+              </div>
+              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={greenSevakForm.control}
@@ -439,7 +504,7 @@ export function VolunteerForm() {
                           <SelectValue placeholder="Select payment method" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent className="bg-[#252A3D] border-[#9b87f5]/30">
+                      <SelectContent>
                         <SelectItem value="upi">UPI</SelectItem>
                         <SelectItem value="bank">Bank Transfer</SelectItem>
                         <SelectItem value="cash">Cash</SelectItem>
@@ -450,18 +515,115 @@ export function VolunteerForm() {
                 )}
               />
               
-              <div className="space-y-2">
-                <FormLabel>Profile Photo</FormLabel>
-                <Input
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleFileUpload(e.target.files[0], "greenSevak", "photoUrl");
-                    }
-                  }}
-                  className="bg-[#252A3D] border-[#9b87f5]/30"
+              <div className="space-y-4">
+                <FormField
+                  control={greenSevakForm.control}
+                  name="previousApplications"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Has any member of your family previously applied for Green Sevak position?</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-[#252A3D] border-[#9b87f5]/30">
+                            <SelectValue placeholder="Select an option" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="yes">Yes</SelectItem>
+                          <SelectItem value="no">No</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
+                
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-[#E2D1C3] font-medium">Family Members</h4>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addFamilyMember}
+                      className="border-[#9b87f5]/30"
+                    >
+                      Add Member
+                    </Button>
+                  </div>
+                  
+                  {familyMembers.map((member, index) => (
+                    <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={greenSevakForm.control}
+                        name={`familyMembers.${index}.fullName`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Full Name</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={greenSevakForm.control}
+                        name={`familyMembers.${index}.relation`}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Relation</FormLabel>
+                            <FormControl>
+                              <Input {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      {index > 0 && (
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => removeFamilyMember(index)}
+                          className="mt-2"
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Income Proof Document</FormLabel>
+                  <Input
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    required
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], "greenSevak", "incomeProofUrl");
+                      }
+                    }}
+                    className="bg-[#252A3D] border-[#9b87f5]/30"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <FormLabel>Profile Photo</FormLabel>
+                  <Input
+                    type="file"
+                    accept=".jpg,.jpeg,.png"
+                    required
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleFileUpload(e.target.files[0], "greenSevak", "photoUrl");
+                      }
+                    }}
+                    className="bg-[#252A3D] border-[#9b87f5]/30"
+                  />
+                </div>
               </div>
               
               <Button 
