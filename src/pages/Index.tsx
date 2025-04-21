@@ -5,9 +5,15 @@ import { Card } from "@/components/ui/card";
 import { AuthForm } from "@/components/AuthForm";
 import { Bike, Heart, Leaf } from "lucide-react";
 import SplashScreen from "@/components/SplashScreen";
+import { auth } from "@/services/firebase";
+import { useNavigate } from "react-router-dom";
+import { VolunteerForm } from "@/components/forms/VolunteerForm";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [showVolunteerForm, setShowVolunteerForm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Hide splash screen after 3 seconds
@@ -15,11 +21,44 @@ export default function Index() {
       setShowSplash(false);
     }, 3000);
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Check if user is already authenticated
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setAuthChecked(true);
+      
+      if (user) {
+        // User is signed in, redirect to main app
+        navigate("/arena");
+      }
+    });
+
+    return () => {
+      clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [navigate]);
 
   if (showSplash) {
     return <SplashScreen />;
+  }
+  
+  if (!authChecked) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
+  
+  if (showVolunteerForm) {
+    return (
+      <div className="min-h-screen p-4 bg-gradient-to-br from-[#1A1F2C] to-[#0F1D31] text-white">
+        <div className="max-w-4xl mx-auto py-8 space-y-6">
+          <button 
+            className="text-white mb-6 flex items-center gap-2 hover:underline"
+            onClick={() => setShowVolunteerForm(false)}
+          >
+            ← Back to login
+          </button>
+          <VolunteerForm />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -37,22 +76,32 @@ export default function Index() {
           <p className="text-lg text-gray-600 max-w-md mx-auto">
             Your journey to a healthier, happier you begins here
           </p>
+          <p className="text-[#7FB069] italic mt-4">"Flourish with Nature. Rise with Purpose."</p>
         </div>
 
         <Card className="p-6 shadow-lg bg-white/80 backdrop-blur-sm">
-          <Tabs defaultValue="signin" className="w-full">
+          <Tabs defaultValue="signup" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin">Sign In</TabsTrigger>
             </TabsList>
-            <TabsContent value="signin">
-              <AuthForm type="signin" />
-            </TabsContent>
             <TabsContent value="signup">
               <AuthForm type="signup" />
             </TabsContent>
+            <TabsContent value="signin">
+              <AuthForm type="signin" />
+            </TabsContent>
           </Tabs>
         </Card>
+        
+        <div className="text-center mt-6">
+          <button 
+            onClick={() => setShowVolunteerForm(true)}
+            className="text-[#2D3047] hover:text-[#7FB069] underline transition-colors"
+          >
+            Apply as a volunteer or Green Sevak
+          </button>
+        </div>
       </div>
     </div>
   );

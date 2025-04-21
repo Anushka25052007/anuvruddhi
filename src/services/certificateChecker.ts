@@ -1,7 +1,8 @@
 
 import { auth, database } from './firebase';
-import { ref, onValue, get } from 'firebase/database';
+import { ref, onValue, get, set } from 'firebase/database';
 import { toast } from '@/hooks/use-toast';
+import { sendTelegramNotification, notifyXpMilestone, notifyCertificateEarned } from './telegramService';
 
 // Function to check if a user has reached milestone for certificate
 export const checkForCertificateEligibility = (userId: string, callback: (type: 'xp' | 'task', data: any) => void) => {
@@ -18,6 +19,12 @@ export const checkForCertificateEligibility = (userId: string, callback: (type: 
         const certificateSnapshot = await get(certificatesRef);
         
         if (!certificateSnapshot.exists()) {
+          // Mark that the certificate has been shown
+          await set(certificatesRef, { shown: true, date: new Date().toISOString() });
+          
+          // Notify via Telegram
+          notifyXpMilestone(userId, 100);
+          
           callback('xp', {
             milestone: 100,
             xp: currentXp,
@@ -32,6 +39,12 @@ export const checkForCertificateEligibility = (userId: string, callback: (type: 
         const certificate200Snapshot = await get(certificates200Ref);
         
         if (!certificate200Snapshot.exists()) {
+          // Mark that the certificate has been shown
+          await set(certificates200Ref, { shown: true, date: new Date().toISOString() });
+          
+          // Notify via Telegram
+          notifyXpMilestone(userId, 200);
+          
           callback('xp', {
             milestone: 200,
             xp: currentXp,
@@ -53,8 +66,14 @@ export const checkForCertificateEligibility = (userId: string, callback: (type: 
         if (taskData.completed && taskData.certified) {
           // Check if this task's certificate has been shown
           const taskCertRef = ref(database, `users/${userId}/certificates/tasks/${taskId}`);
-          get(taskCertRef).then(certSnapshot => {
+          get(taskCertRef).then(async (certSnapshot) => {
             if (!certSnapshot.exists()) {
+              // Mark that the certificate has been shown
+              await set(taskCertRef, { shown: true, date: new Date().toISOString() });
+              
+              // Notify via Telegram
+              notifyCertificateEarned(userId, taskData.name);
+              
               callback('task', {
                 taskId,
                 name: taskData.name,
