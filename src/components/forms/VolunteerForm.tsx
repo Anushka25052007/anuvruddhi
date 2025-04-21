@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -22,15 +23,17 @@ const baseFormSchema = z.object({
   email: z.string().email("Please enter a valid email"),
 });
 
+const familyMemberSchema = z.object({
+  fullName: z.string().min(2, "Full name must be at least 2 characters"),
+  relation: z.string().min(2, "Relation must be specified")
+});
+
 const greenSevakSchema = baseFormSchema.extend({
   familyIncome: z.string()
     .refine(val => Number(val) <= 150000, {
       message: "Family income must be less than ₹1.5 lakhs per annum"
     }),
-  familyMembers: z.array(z.object({
-    fullName: z.string().min(2, "Full name must be at least 2 characters"),
-    relation: z.string().min(2, "Relation must be specified")
-  })).min(1, "At least one family member must be added"),
+  familyMembers: z.array(familyMemberSchema).min(1, "At least one family member must be added"),
   previousApplications: z.string()
     .refine(val => val === "no", {
       message: "Only one member per family can apply"
@@ -45,8 +48,8 @@ const studentVolunteerSchema = baseFormSchema.extend({
   collegeId: z.string().min(1, "Please enter your college ID"),
   apaarId: z.string().min(1, "Please provide your APAAR ID"),
   collegeCity: z.string().min(2, "Please enter your college city"),
-  previousMarksheetUrl: z.string().optional(),
-  currentYearProofUrl: z.string().optional(),
+  previousMarksheetUrl: z.string().min(1, "Previous year marksheet is required"),
+  currentYearProofUrl: z.string().min(1, "Current year learning proof is required"),
 });
 
 export function VolunteerForm() {
@@ -66,6 +69,8 @@ export function VolunteerForm() {
       collegeId: "",
       apaarId: "",
       collegeCity: "",
+      previousMarksheetUrl: "",
+      currentYearProofUrl: "",
     },
   });
 
@@ -80,18 +85,32 @@ export function VolunteerForm() {
       familyMembers: [{ fullName: "", relation: "" }],
       previousApplications: "no",
       paymentMethod: "",
+      photoUrl: "",
+      incomeProofUrl: "",
     },
   });
 
   const [familyMembers, setFamilyMembers] = useState([{ fullName: "", relation: "" }]);
 
   const addFamilyMember = () => {
-    setFamilyMembers([...familyMembers, { fullName: "", relation: "" }]);
+    const newMembers = [...familyMembers, { fullName: "", relation: "" }];
+    setFamilyMembers(newMembers);
+    greenSevakForm.setValue("familyMembers", newMembers);
   };
 
   const removeFamilyMember = (index: number) => {
-    const newMembers = familyMembers.filter((_, i) => i !== index);
-    setFamilyMembers(newMembers);
+    if (familyMembers.length > 1) {
+      const newMembers = familyMembers.filter((_, i) => i !== index);
+      setFamilyMembers(newMembers);
+      greenSevakForm.setValue("familyMembers", newMembers);
+    }
+  };
+
+  const updateFamilyMember = (index: number, field: "fullName" | "relation", value: string) => {
+    const updatedMembers = [...familyMembers];
+    updatedMembers[index][field] = value;
+    setFamilyMembers(updatedMembers);
+    greenSevakForm.setValue("familyMembers", updatedMembers);
   };
 
   // Handle file upload (mock implementation)
@@ -193,6 +212,7 @@ export function VolunteerForm() {
       });
       
       greenSevakForm.reset();
+      setFamilyMembers([{ fullName: "", relation: "" }]);
       
     } catch (error: any) {
       console.error("Error submitting form:", error);
@@ -468,7 +488,7 @@ export function VolunteerForm() {
                   name="familyIncome"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Family Income</FormLabel>
+                      <FormLabel>Family Income (Per Annum)</FormLabel>
                       <FormControl>
                         <Input placeholder="Enter your family income" {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
                       </FormControl>
@@ -479,13 +499,22 @@ export function VolunteerForm() {
                 
                 <FormField
                   control={greenSevakForm.control}
-                  name="familyMembers"
+                  name="paymentMethod"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Number of Family Members</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Enter number of family members" {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
-                      </FormControl>
+                      <FormLabel>Payment Method</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="bg-[#252A3D] border-[#9b87f5]/30">
+                            <SelectValue placeholder="Select payment method" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="upi">UPI</SelectItem>
+                          <SelectItem value="bank">Bank Transfer</SelectItem>
+                          <SelectItem value="cash">Cash</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -494,20 +523,19 @@ export function VolunteerForm() {
               
               <FormField
                 control={greenSevakForm.control}
-                name="paymentMethod"
+                name="previousApplications"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Payment Method</FormLabel>
+                    <FormLabel>Has any member of your family previously applied for Green Sevak position?</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger className="bg-[#252A3D] border-[#9b87f5]/30">
-                          <SelectValue placeholder="Select payment method" />
+                          <SelectValue placeholder="Select an option" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="upi">UPI</SelectItem>
-                        <SelectItem value="bank">Bank Transfer</SelectItem>
-                        <SelectItem value="cash">Cash</SelectItem>
+                        <SelectItem value="yes">Yes</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -516,84 +544,54 @@ export function VolunteerForm() {
               />
               
               <div className="space-y-4">
-                <FormField
-                  control={greenSevakForm.control}
-                  name="previousApplications"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Has any member of your family previously applied for Green Sevak position?</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="bg-[#252A3D] border-[#9b87f5]/30">
-                            <SelectValue placeholder="Select an option" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="yes">Yes</SelectItem>
-                          <SelectItem value="no">No</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h4 className="text-[#E2D1C3] font-medium">Family Members</h4>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={addFamilyMember}
-                      className="border-[#9b87f5]/30"
-                    >
-                      Add Member
-                    </Button>
-                  </div>
-                  
-                  {familyMembers.map((member, index) => (
-                    <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={greenSevakForm.control}
-                        name={`familyMembers.${index}.fullName`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Full Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={greenSevakForm.control}
-                        name={`familyMembers.${index}.relation`}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Relation</FormLabel>
-                            <FormControl>
-                              <Input {...field} className="bg-[#252A3D] border-[#9b87f5]/30" />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {index > 0 && (
-                        <Button
-                          type="button"
-                          variant="destructive"
-                          size="sm"
-                          onClick={() => removeFamilyMember(index)}
-                          className="mt-2"
-                        >
-                          Remove
-                        </Button>
-                      )}
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <h4 className="text-[#E2D1C3] font-medium">Family Members</h4>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addFamilyMember}
+                    className="border-[#9b87f5]/30"
+                  >
+                    Add Member
+                  </Button>
                 </div>
+                
+                {/* Family Members UI - this is where we fixed the error */}
+                {familyMembers.map((member, index) => (
+                  <div key={index} className="p-3 bg-[#252A3D]/50 rounded-md space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm text-[#E2D1C3]">Full Name</label>
+                        <Input 
+                          value={member.fullName}
+                          onChange={(e) => updateFamilyMember(index, "fullName", e.target.value)}
+                          className="bg-[#252A3D] border-[#9b87f5]/30"
+                          placeholder="Enter family member name"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm text-[#E2D1C3]">Relation</label>
+                        <Input 
+                          value={member.relation}
+                          onChange={(e) => updateFamilyMember(index, "relation", e.target.value)}
+                          className="bg-[#252A3D] border-[#9b87f5]/30"
+                          placeholder="Enter relation to applicant"
+                        />
+                      </div>
+                    </div>
+                    {index > 0 && (
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => removeFamilyMember(index)}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                ))}
                 
                 <div className="space-y-2">
                   <FormLabel>Income Proof Document</FormLabel>
