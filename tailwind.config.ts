@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,8 +83,26 @@ export default {
         "float": "float 6s ease-in-out infinite"
       },
       backgroundImage: {
-        "certificate-pattern": "url('/lovable-uploads/a1f630c9-1610-45af-8613-37fe87fdfb8b.png')"
+        "certificate-pattern": "url('/lovable-uploads/a1f630c9-1610-45af-8613-37fe87fdfb8b.png')",
+        "blue-wave-1": "url('/lovable-uploads/b5d3468c-bd12-458e-8c44-de321cb0d03b.png')",
+        "blue-wave-2": "url('/lovable-uploads/5ed150ea-c0a9-490d-bf39-c25dc83c8c03.png')",
+        "blue-wave-3": "url('/lovable-uploads/92d9362a-9ef4-47dc-85fa-82397b07b443.png')",
+        "blue-wave-4": "url('/lovable-uploads/26341c30-b6be-45ff-b1fd-ae1fc8514f8f.png')",
+        "blue-wave-5": "url('/lovable-uploads/581cb1b9-c88f-4c7a-87c9-a09d1081e425.png')",
+        "blue-wave-6": "url('/lovable-uploads/f57c341b-06e3-4fb5-9f0b-c6eb94e07978.png')",
       },
+      backgroundSize: {
+        'wave-cover': '200% 200%',
+      },
+      keyframes: {
+        'wave-animation': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        }
+      },
+      animation: {
+        'wave-bg': 'wave-animation 15s ease infinite',
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
