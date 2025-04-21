@@ -9,7 +9,7 @@ import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { ChainReactionPopup } from "@/components/habits/ChainReactionPopup";
 import { Progress } from "@/components/ui/progress";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { InfoIcon, Award, Trophy, BookOpen, Dumbbell, Timer, Music } from "lucide-react";
+import { InfoIcon, Award, Trophy, BookOpen, Dumbbell, Timer, Music, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
@@ -254,17 +254,27 @@ export default function HabitGarden() {
             <h1 className="text-3xl font-bold text-[#2D3047] mb-2">
               Your Habit Garden
             </h1>
-            <Link to="/certificates">
-              <Button 
-                variant="outline" 
-                className="bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white border-none hover:opacity-90"
-              >
-                <Award className="mr-2 h-4 w-4" />
-                Certificates
-              </Button>
-            </Link>
+            <div className="flex space-x-2">
+              <Link to="/temple">
+                <Button 
+                  variant="outline" 
+                  className="bg-gradient-to-r from-[#9b87f5] to-[#D946EF] text-white border-none hover:opacity-90"
+                >
+                  <Sparkles className="mr-2 h-4 w-4" />
+                  Temple of You
+                </Button>
+              </Link>
+              <Link to="/certificates">
+                <Button 
+                  variant="outline" 
+                  className="bg-gradient-to-r from-[#8B5CF6] to-[#D946EF] text-white border-none hover:opacity-90"
+                >
+                  <Award className="mr-2 h-4 w-4" />
+                  Certificates
+                </Button>
+              </Link>
+            </div>
           </div>
-          <p className="text-[#8E9196] mb-4">Watch your habits grow into beautiful plants</p>
           
           {/* XP Display with Tooltip */}
           <div className="max-w-md mx-auto mb-4 bg-white/70 backdrop-blur-sm rounded-lg p-4 border border-[#7FB069]/30">
