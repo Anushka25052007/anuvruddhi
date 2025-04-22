@@ -1,4 +1,8 @@
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @layer base {
   .bg-blue-wave {
     background: linear-gradient(135deg, rgba(0, 128, 255, 0.1), rgba(0, 212, 255, 0.2));
@@ -12,3 +16,4 @@
     100% { background-position: 0% 50%; }
   }
 }
+
