@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,7 +9,6 @@ import { LocationForm } from "./LocationForm";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
 import { auth, database } from "@/services/firebase";
 import { ref, set, get } from "firebase/database";
-import { useNavigate } from "react-router-dom";
 
 interface AuthFormProps {
   type: "signin" | "signup";
@@ -19,8 +19,9 @@ export function AuthForm({ type }: AuthFormProps) {
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phoneNo, setPhoneNo] = useState("");
+  const [showLocationForm, setShowLocationForm] = useState(false);
+  const [showStartJourney, setShowStartJourney] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,8 +76,8 @@ export function AuthForm({ type }: AuthFormProps) {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userId", user.uid);
       
-      // Redirect to arena (home screen) immediately after authentication
-      navigate("/arena");
+      // Show location form after successful authentication
+      setShowLocationForm(true);
       
     } catch (error: any) {
       console.error("Authentication error:", error);
@@ -127,9 +128,8 @@ export function AuthForm({ type }: AuthFormProps) {
       localStorage.setItem("isAuthenticated", "true");
       localStorage.setItem("userId", user.uid);
       
-      // Redirect to arena (home screen) immediately after Google authentication
-      navigate("/arena");
-      
+      // Show location form after successful authentication
+      setShowLocationForm(true);
     } catch (error: any) {
       console.error("Google authentication error:", error);
       toast({
@@ -187,6 +187,7 @@ export function AuthForm({ type }: AuthFormProps) {
     window.location.href = "/arena";
   };
   
+  // Helper function to send Telegram notifications
   const sendTelegramNotification = async (message: string) => {
     try {
       const encodedMessage = encodeURIComponent(message);
