@@ -1,10 +1,9 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
-import { Mail, Lock, User, Phone } from "lucide-react";
+import { Mail, Lock } from "lucide-react";
 import { LocationForm } from "./LocationForm";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, updateProfile } from "firebase/auth";
 import { auth, database } from "@/services/firebase";
@@ -17,8 +16,6 @@ interface AuthFormProps {
 export function AuthForm({ type }: AuthFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
-  const [phoneNo, setPhoneNo] = useState("");
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [showStartJourney, setShowStartJourney] = useState(false);
   const { toast } = useToast();
@@ -29,33 +26,19 @@ export function AuthForm({ type }: AuthFormProps) {
       let user;
       
       if (type === "signup") {
-        if (!fullName.trim()) {
-          toast({
-            title: "Missing information",
-            description: "Please enter your full name",
-            variant: "destructive",
-          });
-          return;
-        }
-        
         // Create the user account
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         user = userCredential.user;
         
-        // Update profile with display name
-        await updateProfile(user, { displayName: fullName });
-        
         // Save additional user data to Realtime DB
         await set(ref(database, `users/${user.uid}`), {
           email: user.email,
-          fullName,
-          phoneNo: phoneNo || "",
           xp: 0,
           dateJoined: new Date().toISOString()
         });
         
         // Send Telegram notification for new user
-        await sendTelegramNotification(`New user ${fullName} has just registered on Anuvruddhi!`);
+        await sendTelegramNotification(`New user has just registered on Anuvruddhi!`);
         
         toast({
           title: "Account created!",
@@ -187,7 +170,6 @@ export function AuthForm({ type }: AuthFormProps) {
     window.location.href = "/arena";
   };
   
-  // Helper function to send Telegram notifications
   const sendTelegramNotification = async (message: string) => {
     try {
       const encodedMessage = encodeURIComponent(message);
@@ -230,37 +212,6 @@ export function AuthForm({ type }: AuthFormProps) {
               alt="Healthy Lifestyle" 
               className="w-64 h-64 object-contain animate-fade-in"
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <div className="relative">
-              <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                className="pl-9"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="phoneNo">Phone Number (Optional)</Label>
-            <div className="relative">
-              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                id="phoneNo"
-                type="tel"
-                placeholder="Enter your phone number"
-                className="pl-9"
-                value={phoneNo}
-                onChange={(e) => setPhoneNo(e.target.value)}
-              />
-            </div>
           </div>
         </>
       )}
