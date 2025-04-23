@@ -16,6 +16,10 @@ import DailyWheel from "./pages/DailyWheel";
 import HabitGarden from "./pages/HabitGarden";
 import Certificates from "./pages/Certificates";
 import TempleOfYou from "./pages/TempleOfYou";
+import Meditation from "./pages/Meditation";
+import Exercise from "./pages/Exercise";
+import Study from "./pages/Study";
+import Forest from "./pages/Forest";
 
 const queryClient = new QueryClient();
 
@@ -111,6 +115,58 @@ const App = () => {
                         <AppSidebar />
                         <main className="flex-1">
                           <TempleOfYou />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/meditation"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <Meditation />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/exercise"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <Exercise />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/study"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <Study />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/forest"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <Forest />
                         </main>
                       </div>
                     </ProtectedRoute>

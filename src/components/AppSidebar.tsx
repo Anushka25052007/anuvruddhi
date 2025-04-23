@@ -10,13 +10,17 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Bike, Heart, Leaf, Crown, Trophy, Brain } from "lucide-react";
+import { Bike, Heart, Leaf, Crown, Trophy, Brain, Music, BookOpen, TreePine } from "lucide-react";
 
 const menuItems = [
   { title: "Motivation Arena", icon: Heart, path: "/arena" },
   { title: "Daily Wheel", icon: Bike, path: "/wheel" },
   { title: "Habit Garden", icon: Leaf, path: "/habits" },
   { title: "Temple of You", icon: Crown, path: "/temple" },
+  { title: "Meditation", icon: Brain, path: "/meditation" },
+  { title: "Exercise", icon: Bike, path: "/exercise" },
+  { title: "Study", icon: BookOpen, path: "/study" },
+  { title: "My Forest", icon: TreePine, path: "/forest" },
   { title: "Certificates", icon: Trophy, path: "/certificates" },
 ];
 
