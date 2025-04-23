@@ -6,17 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Flower2, Sun, Leaf, BookOpen, Timer, Music, Dumbbell } from "lucide-react";
 
 interface HabitPlantProps {
-  habit: {
-    id: number;
-    name: string;
-    streak: number;
-    type: string;
-    xp: number;
-  };
-  onComplete: () => void;
+  name: string;
+  xp: number;
+  completed: boolean;
+  onClick: () => void;
 }
 
-export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
+export function HabitPlant({ name, xp, completed, onClick }: HabitPlantProps) {
+  // Simplified version to match the props being passed in HabitGarden.tsx
+  const type = "leaf"; // Default type for now
+  const streak = completed ? 1 : 0; // Simple determination based on completion status
+  
   const getGrowthStage = (streak: number) => {
     if (streak >= 7) return "blooming";
     if (streak >= 3) return "growing";
@@ -70,12 +70,12 @@ export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
     }
   };
 
-  const Icon = getIcon(habit.type);
-  const stage = getGrowthStage(habit.streak);
-  const gradient = getGradient(habit.type);
+  const Icon = getIcon(type);
+  const stage = getGrowthStage(streak);
+  const gradient = getGradient(type);
 
   return (
-    <Card className="p-4 bg-white/80 backdrop-blur-sm border-2 hover:border-[#7FB069] transition-all overflow-hidden">
+    <Card className={`p-4 bg-white/80 backdrop-blur-sm border-2 ${completed ? 'border-[#7FB069]' : 'hover:border-[#7FB069]'} transition-all overflow-hidden`}>
       <div className="flex items-center justify-between relative">
         {/* Background effect based on habit type */}
         <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-gradient-to-br opacity-5 -translate-y-1/2 translate-x-1/2 blur-md" />
@@ -100,7 +100,7 @@ export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
           
           <div>
             <h3 className="font-semibold text-lg text-[#2D3047]">
-              {habit.name}
+              {name}
             </h3>
             <div className="flex items-center gap-4">
               <div className="flex-1 flex items-center space-x-2">
@@ -108,29 +108,29 @@ export function HabitPlant({ habit, onComplete }: HabitPlantProps) {
                   <div className="absolute inset-0 rounded-full bg-gray-200"></div>
                   <motion.div
                     className={`absolute inset-y-0 left-0 rounded-full bg-gradient-to-r ${gradient}`}
-                    style={{ width: `${Math.min(habit.streak * 14, 100)}%` }}
+                    style={{ width: `${completed ? 100 : 0}%` }}
                     initial={{ width: '0%' }}
-                    animate={{ width: `${Math.min(habit.streak * 14, 100)}%` }}
+                    animate={{ width: `${completed ? 100 : 0}%` }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
                 <span className="text-sm text-[#8E9196] whitespace-nowrap">
-                  {habit.streak} day{habit.streak !== 1 ? "s" : ""}
+                  {completed ? "Completed" : "Not started"}
                 </span>
               </div>
               <span className="text-sm font-medium bg-gradient-to-br bg-clip-text text-transparent whitespace-nowrap ${gradient}">
-                +{habit.xp} XP
+                +{xp} XP
               </span>
             </div>
           </div>
         </div>
 
         <Button
-          onClick={onComplete}
+          onClick={onClick}
           variant="outline"
           className={`bg-gradient-to-r ${gradient} text-white border-none hover:opacity-90 z-10`}
         >
-          Complete
+          {completed ? "Completed" : "Complete"}
         </Button>
       </div>
     </Card>
