@@ -1,0 +1,1 @@
+At first app launch, show a Sign up or Sign in screen with email/password and Google options; once the user logs in, save their UID/session state and skip login on future app launches unless they log out manually.
