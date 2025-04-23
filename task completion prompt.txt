@@ -1,0 +1,1 @@
+When a user completes a task such as meditation or tree planting, automatically award XP and update their current streak, then trigger a success animation and optional badge unlock if milestones are reached.
