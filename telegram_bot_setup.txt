@@ -1,0 +1,1 @@
+Create a Telegram bot using BotFather, copy the token add the bot to a public channel or group as admin, get the chat ID using getUpdates URL, and format the message API as a GET request to send milestone alerts automatically.
