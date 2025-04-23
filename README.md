@@ -1,5 +1,8 @@
 # Welcome to your Lovable project
 
+<img src="app_icon.jpg" alt="Anuvruddhi App Icon" width="120"/>
+Flourish with Nature. Rise with purpose.
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/2261b706-cbde-4a67-98bf-48bd75acff99
