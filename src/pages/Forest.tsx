@@ -1,21 +1,15 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TreePine, Map, QrCode, Camera, Users } from "lucide-react";
+import { TreePine, Map, QrCode, Camera, Users, Upload } from "lucide-react";
 import { motion } from "framer-motion";
+import { useToast } from "@/components/ui/use-toast";
+import { auth, database } from "@/services/firebase";
+import { ref, onValue, update } from "firebase/database";
 import { 
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, 
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
 } from "recharts";
 
 const treeData = [
@@ -63,11 +57,58 @@ const communityPosts = [
 
 export default function Forest() {
   const [activeTab, setActiveTab] = useState("tracking");
-  const totalTrees = treeData.reduce((sum, item) => sum + item.trees, 0);
-  
+  const [userXp, setUserXp] = useState(0);
+  const [treesPlanted, setTreesPlanted] = useState(0);
+  const [xpProgress, setXpProgress] = useState(0);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userXpRef = ref(database, `users/${user.uid}/xp`);
+    const treesRef = ref(database, `users/${user.uid}/treesPlanted`);
+
+    const xpListener = onValue(userXpRef, (snapshot) => {
+      const xp = snapshot.val() || 0;
+      setUserXp(xp);
+      setXpProgress(xp % 200);
+    });
+
+    const treesListener = onValue(treesRef, (snapshot) => {
+      const trees = snapshot.val() || 0;
+      setTreesPlanted(trees);
+    });
+
+    return () => {
+      xpListener();
+      treesListener();
+    };
+  }, []);
+
+  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    toast({
+      title: "🌱 Photo Verified!",
+      description: "Your tree planting has been verified. +50 XP bonus!",
+    });
+
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const newXp = userXp + 50;
+    const newTrees = Math.floor(newXp / 200);
+
+    await update(ref(database, `users/${user.uid}`), {
+      xp: newXp,
+      treesPlanted: newTrees
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0EA5E9]/10 to-[#1E40AF]/20 relative overflow-hidden">
-      {/* Animated background elements */}
       <motion.div
         className="absolute inset-0 z-0"
         initial={{ backgroundPosition: "0% 50%" }}
@@ -92,14 +133,32 @@ export default function Forest() {
           </motion.h1>
           <p className="text-[#1E40AF]/80">Track your tree planting journey and impact</p>
           <motion.div 
-            className="flex justify-center items-center gap-2 mt-4"
+            className="flex justify-center items-center gap-4 mt-6"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <TreePine className="h-6 w-6 text-[#0EA5E9]" />
-            <span className="text-2xl font-bold text-[#0EA5E9]">{totalTrees}</span>
-            <span className="text-[#1E40AF]/80">Trees Planted</span>
+            <div className="bg-gradient-to-br from-[#7FB069] to-[#5D874C] p-6 rounded-lg shadow-lg">
+              <TreePine className="h-8 w-8 text-white mb-2" />
+              <span className="text-2xl font-bold text-white block">{treesPlanted}</span>
+              <span className="text-white/90 text-sm">Trees Planted</span>
+            </div>
+            <div className="bg-gradient-to-br from-[#0EA5E9] to-[#1E40AF] p-6 rounded-lg shadow-lg">
+              <div className="mb-2">
+                <span className="text-white text-xl">Next Tree Progress</span>
+              </div>
+              <div className="w-full bg-white/20 rounded-full h-4">
+                <motion.div 
+                  className="bg-white h-4 rounded-full"
+                  initial={{ width: 0 }}
+                  animate={{ width: `${(xpProgress / 200) * 100}%` }}
+                  transition={{ duration: 1 }}
+                />
+              </div>
+              <span className="text-white/90 text-sm mt-1 block">
+                {xpProgress}/200 XP
+              </span>
+            </div>
           </motion.div>
         </div>
         
@@ -130,7 +189,7 @@ export default function Forest() {
           </TabsList>
           
           <TabsContent value="tracking">
-            <Card className="p-6 mb-6 bg-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+            <Card className="p-6 mb-6 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
               <h3 className="text-lg font-medium mb-4 text-[#1E40AF]">Monthly Planting Progress</h3>
               <div className="h-72">
                 <ResponsiveContainer width="100%" height="100%">
@@ -150,7 +209,7 @@ export default function Forest() {
               </div>
             </Card>
             
-            <Card className="p-6 bg-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+            <Card className="p-6 bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
               <h3 className="text-lg font-medium mb-4 text-[#1E40AF]">Planting Locations</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="h-64">
@@ -200,7 +259,7 @@ export default function Forest() {
           </TabsContent>
           
           <TabsContent value="qrcode">
-            <Card className="p-6 text-center bg-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
+            <Card className="p-6 text-center bg-gradient-to-br from-white/90 to-white/80 backdrop-blur-sm border border-[#0EA5E9]/20 hover:border-[#0EA5E9]/40 transition-all">
               <motion.div
                 animate={{
                   scale: [1, 1.05, 1],
@@ -216,13 +275,26 @@ export default function Forest() {
               </motion.div>
               <h3 className="text-lg font-medium mb-2 text-[#1E40AF]">Tree Planting Verification</h3>
               <p className="text-[#1E40AF]/80 mb-6">
-                Scan this QR code or upload a photo to verify your tree planting
+                Upload a photo of your planted tree with your name tag to earn 50 XP bonus!
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button className="bg-[#0EA5E9] hover:bg-[#0EA5E9]/90">
-                  <Camera className="mr-2 h-4 w-4" /> Upload Photo
+                <Button 
+                  className="bg-[#7FB069] hover:bg-[#5D874C] relative overflow-hidden"
+                  onClick={() => document.getElementById('photoUpload')?.click()}
+                >
+                  <Camera className="mr-2 h-4 w-4" /> Upload Tree Photo
+                  <input
+                    id="photoUpload"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handlePhotoUpload}
+                  />
                 </Button>
-                <Button variant="outline" className="border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9]/10">
+                <Button 
+                  variant="outline" 
+                  className="border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9]/10"
+                >
                   <Map className="mr-2 h-4 w-4" /> Share Location
                 </Button>
               </div>
