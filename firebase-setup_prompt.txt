@@ -1,0 +1,1 @@
+Connect Firebase Realtime Database and Firebase Authentication using your project config; store user data like UID, email, XP, badges, and tasks, and use Firebase listeners to trigger level progression and certificate generation in real-time.
