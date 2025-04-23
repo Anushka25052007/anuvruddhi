@@ -25,6 +25,7 @@ import { Link } from "react-router-dom";
 export default function TempleOfYou() {
   const [userData, setUserData] = useState<any>(null);
   const [totalXp, setTotalXp] = useState(0);
+  const [streakDays, setStreakDays] = useState(0);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
@@ -36,6 +37,10 @@ export default function TempleOfYou() {
         try {
           const data = await getUserData(user.uid);
           setUserData(data);
+          
+          // Set streak days (this could come from Firebase in a real implementation)
+          // For demo purposes, we'll calculate it based on the XP
+          setStreakDays(Math.floor((data?.xp || 0) / 25));
           
           // Listen to XP changes
           const xpUnsubscribe = listenToUserXp(user.uid, (xp) => {
@@ -204,7 +209,7 @@ export default function TempleOfYou() {
           
           {/* Middle column - Life Avatar */}
           <div className="flex flex-col gap-6 items-center">
-            <LifeAvatar xpLevel={totalXp} />
+            <LifeAvatar xpLevel={totalXp} streakDays={streakDays} />
             <SoulGemCollection totalXp={totalXp} />
           </div>
           
