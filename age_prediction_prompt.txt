@@ -1,0 +1,1 @@
+Use the user's input data like age, daily habits, stress score, and sleep hours to run a rule-based prediction logic and show a lifespan estimate, health tip, and wellness badge using an animated progress bar and calming UI.
