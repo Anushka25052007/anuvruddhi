@@ -1,0 +1,1 @@
+When the user's XP reaches specific thresholds like 75000 XP, check eligibility in Firebase and auto-generate a digital certificate with the user's name, location, XP, and date, styled in the dark blue diamond-theme layout.
