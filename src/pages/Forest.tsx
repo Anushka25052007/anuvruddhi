@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -60,6 +61,7 @@ export default function Forest() {
   const [userXp, setUserXp] = useState(0);
   const [treesPlanted, setTreesPlanted] = useState(0);
   const [xpProgress, setXpProgress] = useState(0);
+  const [totalTrees, setTotalTrees] = useState(0); // Add the missing totalTrees state
   const { toast } = useToast();
 
   useEffect(() => {
@@ -78,6 +80,7 @@ export default function Forest() {
     const treesListener = onValue(treesRef, (snapshot) => {
       const trees = snapshot.val() || 0;
       setTreesPlanted(trees);
+      setTotalTrees(trees); // Set the totalTrees state when trees are loaded
     });
 
     return () => {
