@@ -23,35 +23,6 @@ If you want to work locally using your own IDE, you can clone this repo and push
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
 ## What technologies are used for this project?
 
@@ -63,21 +34,23 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/2261b706-cbde-4a67-98bf-48bd75acff99) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
 
 #  Anuvruddhi - Flourish with Nature. Rise with Purpose.
-**Anuvruddhi** is a gamified life balance and eco-action app that inspires users to develop mindful habaits, plant trees, earn XP, and grow spiritually and socially through meaningful actions.
+** Anuvruddhi ** is a gamified life-growth and eco-conscious app that empowers users to evolve mentally, emotionally, and spiritually through daily mindful actions - while giving back to the planet through tree planting, gratitude rituals, and soul-based tasks.
+
 --
+##    Project Vision 
+Anuvruddhi is not just an app - it's a movement to help individuals grow menatally, emotionally, and spiritually while also connecting deeply with nature. Our mission is to inspire meaningful action, personal reflection, and real-world impact through a gamified self-evolution journey.
+
+---
+
+##    Core Objectives
+-  Empower users to build healthy, mindful habits
+-  Encourage environmental responsibility through tree-planting tasks
+-  Reward growth with XP, certificates, and Sould Gems
+-  Create a safe, encouraginng digital space for self-reflection and purpose.
+
+  
 ## ** Key Features
 
 - Firebase Authentication (Sign Up/ Login / Session Tracking)
@@ -111,6 +84,27 @@ You can find my lovable prompt logic here:
 - [Self Avatar Creation Prompt](prompts/self_avatar_creation_prompt.txt)
 
   Add prompt file links to README
+
+  ## Getting Started
+     1.  Click the live App link above
+     2.  Sign up with your email
+     3.  complete a daily task
+     4.  Watch your XP and avatar on Telegram
+     5.  Share your milestone on Telegram
+
+        ---
+  ## Credits
+     -  UI design: ** Anushka Sarode ** (First-year engineering student)
+     -  Icons & visual assets : Canva, Figma
+     -  Core Logic prompts : Written & executed in lovable
+     -  Backend: Firebase
+     -  Real-time rewards: Telegram Bot
+ 
+       --
+  ##     Developed by
+     ** Anushka Sarode **
+  First Year Engineering Student
+  * National Hackathon Submission 2025 *
 
   ##   Author
   Anushka Sarode - First Year Engineering Student
