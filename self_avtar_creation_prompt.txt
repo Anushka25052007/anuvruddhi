@@ -1,0 +1,1 @@
+Create a life Avatar system that changes visual appearance as the user gains XP or unlocks Sould Gems, using animated transitions, aura effects, or avatar stage icons that reflect the user's growth, discipline, and spiritual level in the app.
