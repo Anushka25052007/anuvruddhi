@@ -7,6 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import MotivationArena from "./pages/MotivationArena";
@@ -45,35 +47,79 @@ const App = () => {
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/arena" element={
-              <ProtectedRoute>
-                <MotivationArena />
-              </ProtectedRoute>
-            } />
-            <Route path="/wheel" element={
-              <ProtectedRoute>
-                <DailyWheel />
-              </ProtectedRoute>
-            } />
-            <Route path="/habits" element={
-              <ProtectedRoute>
-                <HabitGarden />
-              </ProtectedRoute>
-            } />
-            <Route path="/certificates" element={
-              <ProtectedRoute>
-                <Certificates />
-              </ProtectedRoute>
-            } />
-            <Route path="/temple" element={
-              <ProtectedRoute>
-                <TempleOfYou />
-              </ProtectedRoute>
-            } />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <SidebarProvider>
+            <div className="min-h-screen flex w-full">
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route
+                  path="/arena"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <MotivationArena />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/wheel"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <DailyWheel />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/habits"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <HabitGarden />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/certificates"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <Certificates />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/temple"
+                  element={
+                    <ProtectedRoute>
+                      <div className="flex w-full">
+                        <AppSidebar />
+                        <main className="flex-1">
+                          <TempleOfYou />
+                        </main>
+                      </div>
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </div>
+          </SidebarProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
