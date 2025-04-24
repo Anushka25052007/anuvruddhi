@@ -7,13 +7,10 @@ import { Bike, Heart, Leaf } from "lucide-react";
 import SplashScreen from "@/components/SplashScreen";
 import { auth } from "@/services/firebase";
 import { useNavigate } from "react-router-dom";
-import { VolunteerForm } from "@/components/forms/VolunteerForm";
-import { GreenSevakForm } from "@/components/forms/GreenSevakForm";
 
 export default function Index() {
   const [showSplash, setShowSplash] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
-  const [formType, setFormType] = useState<"auth" | "volunteer" | "green-sevak">("auth");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,38 +41,6 @@ export default function Index() {
   
   if (!authChecked) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
-  
-  if (formType === "volunteer") {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-[#1A1F2C] to-[#0F1D31] text-white">
-        <div className="max-w-4xl mx-auto py-8 space-y-6">
-          <button 
-            className="text-white mb-6 flex items-center gap-2 hover:underline"
-            onClick={() => setFormType("auth")}
-          >
-            ← Back to login
-          </button>
-          <VolunteerForm />
-        </div>
-      </div>
-    );
-  }
-  
-  if (formType === "green-sevak") {
-    return (
-      <div className="min-h-screen p-4 bg-gradient-to-br from-[#1A1F2C] to-[#0F1D31] text-white">
-        <div className="max-w-4xl mx-auto py-8 space-y-6">
-          <button 
-            className="text-white mb-6 flex items-center gap-2 hover:underline"
-            onClick={() => setFormType("auth")}
-          >
-            ← Back to login
-          </button>
-          <GreenSevakForm />
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -110,21 +75,6 @@ export default function Index() {
             </TabsContent>
           </Tabs>
         </Card>
-        
-        <div className="text-center mt-6 flex flex-col sm:flex-row justify-center gap-4">
-          <button 
-            onClick={() => setFormType("volunteer")}
-            className="text-[#2D3047] hover:text-[#7FB069] underline transition-colors"
-          >
-            Apply as a volunteer
-          </button>
-          <button 
-            onClick={() => setFormType("green-sevak")}
-            className="text-[#2D3047] hover:text-[#7FB069] underline transition-colors"
-          >
-            Apply as a Green Sevak
-          </button>
-        </div>
       </div>
     </div>
   );

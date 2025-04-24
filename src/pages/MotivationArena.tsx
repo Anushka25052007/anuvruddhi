@@ -7,6 +7,7 @@ import { Droplet, Wind, Trees, Clock, Sparkles, Heart } from "lucide-react";
 import { TaskTile } from "@/components/motivation/TaskTile";
 import { SpiritTree } from "@/components/motivation/SpiritTree";
 import { ParticleEffect } from "@/components/motivation/ParticleEffect";
+import { UserProfileDrawer } from "@/components/UserProfileDrawer";
 
 const challenges = [
   {
@@ -54,6 +55,7 @@ export default function MotivationArena() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] to-[#FEC6A1] relative overflow-hidden">
+      <UserProfileDrawer />
       <ParticleEffect />
       
       {/* Background animated shapes */}

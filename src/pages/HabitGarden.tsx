@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -78,7 +79,13 @@ export default function HabitGarden() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
+            className="flex flex-col items-center"
           >
+            <img 
+              src="/lovable-uploads/7c5f6da8-5d64-4a0a-8ca0-9de8578546e3.png" 
+              alt="Habit Garden Logo" 
+              className="w-40 h-40 mb-4 object-contain animate-fade-in"
+            />
             <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-[#7FB069] to-[#1EAEDB] bg-clip-text text-transparent flex justify-center items-center">
               <Sparkles className="mr-3 h-8 w-8 text-[#F97316]" />
               Your Habit Garden
