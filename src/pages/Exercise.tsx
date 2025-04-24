@@ -1,10 +1,12 @@
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Dumbbell, Flame, Sparkles, Heart, Timer } from "lucide-react";
+import { Dumbbell, Flame, Sparkles, Heart, Timer, Camera, Check } from "lucide-react";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
 const exerciseCategories = [
   {
@@ -41,18 +43,103 @@ const exerciseCategories = [
 
 export default function Exercise() {
   const [completedExercises, setCompletedExercises] = useState<string[]>([]);
+  const [activeExercise, setActiveExercise] = useState<string | null>(null);
+  const [timerRunning, setTimerRunning] = useState(false);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [showProofDialog, setShowProofDialog] = useState(false);
+  const [exerciseProof, setExerciseProof] = useState<File | null>(null);
+  const timerRef = useRef<number | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleCompleteExercise = (exerciseName: string) => {
-    if (completedExercises.includes(exerciseName)) {
-      setCompletedExercises(completedExercises.filter(name => name !== exerciseName));
-    } else {
-      setCompletedExercises([...completedExercises, exerciseName]);
+  // Clean up timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+  const handleStartTimer = (exerciseName: string, durationText: string) => {
+    // Already running for this exercise
+    if (timerRunning && activeExercise === exerciseName) return;
+    
+    // Stop previous timer if exists
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
     }
+    
+    // Parse duration from text (e.g. "10 mins" -> 600 seconds)
+    const minutes = parseInt(durationText.split(' ')[0]);
+    const seconds = minutes * 60;
+    
+    setActiveExercise(exerciseName);
+    setTimeRemaining(seconds);
+    setTimerRunning(true);
+    
+    // Start new timer
+    timerRef.current = window.setInterval(() => {
+      setTimeRemaining(prev => {
+        if (prev <= 1) {
+          // Timer complete
+          clearInterval(timerRef.current!);
+          setTimerRunning(false);
+          setShowProofDialog(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    toast.info(`Started ${exerciseName} timer for ${minutes} minutes`);
+  };
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setExerciseProof(file);
+    }
+  };
+
+  const handleSubmitProof = () => {
+    if (!exerciseProof) {
+      toast.error("Please upload a proof image first");
+      return;
+    }
+    
+    if (!activeExercise) return;
+    
+    // Mark the exercise as completed
+    setCompletedExercises(prev => [...prev, activeExercise]);
+    
+    // Reset states
+    setShowProofDialog(false);
+    setExerciseProof(null);
+    setActiveExercise(null);
+    
+    toast.success("Exercise completed! +20 XP", {
+      description: "Great job on completing your workout!"
+    });
+  };
+
+  const handleSkipProof = () => {
+    setShowProofDialog(false);
+    setExerciseProof(null);
+    
+    toast.info("Exercise skipped", {
+      description: "No proof uploaded, no XP awarded"
+    });
   };
 
   // Calculate total XP
   const calculateTotalXp = () => {
-    return completedExercises.length * 10;
+    return completedExercises.length * 20;
   };
 
   return (
@@ -174,23 +261,33 @@ export default function Exercise() {
                             </div>
                           </div>
                         </div>
-                        <motion.button 
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          className={`px-4 py-2 rounded-md text-sm font-medium ${
-                            completedExercises.includes(exercise.name)
-                              ? "text-white"
-                              : "border text-[#2D3047]/70 border-[#2D3047]/20"
-                          }`}
-                          style={{ 
-                            backgroundColor: completedExercises.includes(exercise.name) 
-                              ? category.color 
-                              : "transparent" 
-                          }}
-                          onClick={() => handleCompleteExercise(exercise.name)}
-                        >
-                          {completedExercises.includes(exercise.name) ? "Completed" : "Complete"}
-                        </motion.button>
+                        
+                        {timerRunning && activeExercise === exercise.name ? (
+                          <div className="flex flex-col items-end">
+                            <span className="text-lg font-bold mb-1" style={{ color: category.color }}>
+                              {formatTime(timeRemaining)}
+                            </span>
+                            <span className="text-xs text-[#2D3047]/70">Timer running...</span>
+                          </div>
+                        ) : completedExercises.includes(exercise.name) ? (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-4 py-2 rounded-md text-sm font-medium text-white"
+                            style={{ backgroundColor: category.color }}
+                          >
+                            <Check className="h-4 w-4" />
+                          </motion.div>
+                        ) : (
+                          <motion.button 
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="px-4 py-2 rounded-md text-sm font-medium border text-[#2D3047]/70 border-[#2D3047]/20"
+                            onClick={() => handleStartTimer(exercise.name, exercise.duration)}
+                          >
+                            Start Timer
+                          </motion.button>
+                        )}
                       </div>
                     </Card>
                   </motion.div>
@@ -224,9 +321,67 @@ export default function Exercise() {
                 {completedExercises.length}/9
               </span>
             </div>
+            <span className="font-medium text-[#D946EF]">{calculateTotalXp()} XP earned</span>
           </div>
         </motion.div>
       </div>
+
+      {/* Exercise Proof Dialog */}
+      <Dialog open={showProofDialog} onOpenChange={setShowProofDialog}>
+        <DialogContent className="bg-white/95 backdrop-blur-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <Camera className="h-5 w-5 mr-2 text-[#F97316]" />
+              Upload Exercise Proof
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            <p className="text-[#2D3047]/80 mb-4">
+              Great job completing your exercise! Please upload a photo as proof to earn XP.
+            </p>
+            
+            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-[#9b87f5]/30 rounded-lg">
+              {exerciseProof ? (
+                <div className="text-center">
+                  <div className="mb-2 text-[#9b87f5]">{exerciseProof.name}</div>
+                  <img 
+                    src={URL.createObjectURL(exerciseProof)} 
+                    alt="Exercise proof" 
+                    className="max-h-40 mx-auto object-contain rounded-md"
+                  />
+                </div>
+              ) : (
+                <div className="text-center">
+                  <Camera className="h-12 w-12 mx-auto text-[#9b87f5]/40 mb-2" />
+                  <p className="text-[#2D3047]/70">Click to upload a photo</p>
+                </div>
+              )}
+              
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+              />
+            </div>
+          </div>
+          
+          <DialogFooter className="flex gap-2 sm:gap-0">
+            <Button variant="outline" onClick={handleSkipProof}>
+              Skip
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-[#9b87f5] to-[#D946EF]"
+              onClick={handleSubmitProof}
+              disabled={!exerciseProof}
+            >
+              Submit Proof
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

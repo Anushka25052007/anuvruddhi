@@ -1,18 +1,21 @@
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Music, Play, Pause, Search, Sparkles, Moon, Sun, Cloud, Leaf, Heart } from "lucide-react";
+import { Music, Play, Pause, Search, Sparkles, Moon, Sun, Cloud, Leaf, Heart, Volume2, VolumeX } from "lucide-react";
+import { toast } from "sonner";
+import { Slider } from "@/components/ui/slider";
 
+// Audio tracks for meditation
 const meditationTracks = [
-  { id: 1, title: "Morning Calm", duration: "10:00", category: "mindfulness", color: "#F97316" },
-  { id: 2, title: "Deep Relaxation", duration: "15:00", category: "sleep", color: "#9b87f5" },
-  { id: 3, title: "Focused Mind", duration: "8:00", category: "focus", color: "#1EAEDB" },
-  { id: 4, title: "Stress Relief", duration: "12:00", category: "anxiety", color: "#D946EF" },
-  { id: 5, title: "Nature Sounds", duration: "20:00", category: "nature", color: "#7FB069" },
-  { id: 6, title: "Chakra Healing", duration: "18:00", category: "spiritual", color: "#FEC6A1" },
+  { id: 1, title: "Morning Calm", duration: "10:00", category: "mindfulness", color: "#F97316", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-hazy-after-hours-132.mp3" },
+  { id: 2, title: "Deep Relaxation", duration: "15:00", category: "sleep", color: "#9b87f5", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-sleepy-cat-135.mp3" },
+  { id: 3, title: "Focused Mind", duration: "8:00", category: "focus", color: "#1EAEDB", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-serene-view-443.mp3" },
+  { id: 4, title: "Stress Relief", duration: "12:00", category: "anxiety", color: "#D946EF", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-relaxing-in-nature-522.mp3" },
+  { id: 5, title: "Nature Sounds", duration: "20:00", category: "nature", color: "#7FB069", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-forest-treasure-138.mp3" },
+  { id: 6, title: "Chakra Healing", duration: "18:00", category: "spiritual", color: "#FEC6A1", audioUrl: "https://assets.mixkit.co/music/preview/mixkit-deep-meditation-109.mp3" },
 ];
 
 const categories = [
@@ -29,6 +32,11 @@ export default function Meditation() {
   const [currentTrack, setCurrentTrack] = useState<number | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [volume, setVolume] = useState(0.7);
+  const [isMuted, setIsMuted] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const progressInterval = useRef<number | null>(null);
 
   const filteredTracks = meditationTracks.filter(track => {
     const matchesSearch = 
@@ -41,17 +49,111 @@ export default function Meditation() {
   });
 
   const handlePlayTrack = (trackId: number) => {
+    const track = meditationTracks.find(t => t.id === trackId);
+    
+    if (!track) return;
+    
     if (currentTrack === trackId) {
-      setIsPlaying(!isPlaying);
+      // Toggle play/pause for current track
+      if (audioRef.current) {
+        if (isPlaying) {
+          audioRef.current.pause();
+          if (progressInterval.current) {
+            window.clearInterval(progressInterval.current);
+            progressInterval.current = null;
+          }
+        } else {
+          audioRef.current.play();
+          startProgressTracking();
+        }
+        setIsPlaying(!isPlaying);
+      }
     } else {
+      // Switch to a new track
+      if (audioRef.current) {
+        audioRef.current.pause();
+        if (progressInterval.current) {
+          window.clearInterval(progressInterval.current);
+          progressInterval.current = null;
+        }
+      }
+      
       setCurrentTrack(trackId);
       setIsPlaying(true);
+      
+      // Create new audio element
+      const audio = new Audio(track.audioUrl);
+      audio.volume = volume;
+      audio.muted = isMuted;
+      
+      audio.addEventListener('ended', () => {
+        setIsPlaying(false);
+        setProgress(0);
+        if (progressInterval.current) {
+          window.clearInterval(progressInterval.current);
+          progressInterval.current = null;
+        }
+        toast.info(`${track.title} has ended`);
+      });
+      
+      audio.addEventListener('error', () => {
+        toast.error(`Failed to play ${track.title}. Please try again.`);
+        setIsPlaying(false);
+      });
+      
+      audioRef.current = audio;
+      audio.play().catch(error => {
+        toast.error(`Failed to play audio: ${error.message}`);
+        setIsPlaying(false);
+      });
+      
+      startProgressTracking();
+    }
+  };
+
+  const startProgressTracking = () => {
+    if (progressInterval.current) {
+      window.clearInterval(progressInterval.current);
+    }
+    
+    setProgress(0);
+    progressInterval.current = window.setInterval(() => {
+      if (audioRef.current) {
+        const percent = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+        setProgress(percent || 0);
+      }
+    }, 1000);
+  };
+
+  const handleVolumeChange = (newVolume: number[]) => {
+    const volumeValue = newVolume[0];
+    setVolume(volumeValue);
+    if (audioRef.current) {
+      audioRef.current.volume = volumeValue;
+    }
+    
+    if (volumeValue > 0 && isMuted) {
+      setIsMuted(false);
+      if (audioRef.current) audioRef.current.muted = false;
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    if (audioRef.current) {
+      audioRef.current.muted = !isMuted;
     }
   };
 
   const getCategoryIcon = (categoryName: string) => {
     const category = categories.find(cat => cat.name === categoryName);
     return category?.icon || Music;
+  };
+
+  const handleCompleteSession = () => {
+    toast.success("Meditation completed! +50 XP", {
+      description: "Keep up the great mindfulness practice"
+    });
   };
 
   return (
@@ -136,11 +238,45 @@ export default function Meditation() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              {<category.icon className="h-3.5 w-3.5" />}
+              {React.createElement(category.icon, { className: "h-3.5 w-3.5" })}
               <span className="capitalize">{category.name}</span>
             </motion.button>
           ))}
         </div>
+        
+        {currentTrack && (
+          <div className="mb-6 p-3 bg-white/60 backdrop-blur-md rounded-lg flex items-center">
+            <div className="flex-grow">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-sm font-medium text-[#2D3047]">
+                  Now Playing: {meditationTracks.find(t => t.id === currentTrack)?.title}
+                </span>
+                <button onClick={toggleMute} className="p-1">
+                  {isMuted ? <VolumeX className="h-4 w-4 text-[#2D3047]/70" /> : <Volume2 className="h-4 w-4 text-[#2D3047]/70" />}
+                </button>
+              </div>
+              <div className="w-full h-1.5 bg-[#9b87f5]/20 rounded-full overflow-hidden">
+                <motion.div 
+                  className="h-full bg-[#9b87f5]" 
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+              <div className="flex justify-between items-center mt-2">
+                <Slider 
+                  value={[volume]} 
+                  max={1} 
+                  step={0.01} 
+                  onValueChange={handleVolumeChange}
+                  className="w-32 mr-4"
+                />
+                <span className="text-xs text-[#2D3047]/70">{Math.floor(progress * 0.01 * parseInt(meditationTracks.find(t => t.id === currentTrack)?.duration.split(':')[0] || '0'))}:
+                  {String(Math.floor((progress * 0.01 * parseInt(meditationTracks.find(t => t.id === currentTrack)?.duration.split(':')[1] || '0')))).padStart(2, '0')} / 
+                  {meditationTracks.find(t => t.id === currentTrack)?.duration}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2">
           {filteredTracks.map((track, index) => (
@@ -197,14 +333,7 @@ export default function Meditation() {
                   >
                     <motion.div 
                       className="h-full" 
-                      style={{ backgroundColor: track.color }}
-                      initial={{ width: "0%" }}
-                      animate={{ width: "100%" }}
-                      transition={{ 
-                        duration: parseInt(track.duration.split(':')[0]) * 60 + 
-                                  parseInt(track.duration.split(':')[1]),
-                        ease: "linear"
-                      }}
+                      style={{ backgroundColor: track.color, width: `${progress}%` }}
                     />
                   </motion.div>
                 )}
@@ -216,7 +345,10 @@ export default function Meditation() {
         <div className="mt-8 text-center">
           <p className="text-sm text-[#2D3047]/70 mb-4">Track your daily meditation minutes for XP</p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Button className="bg-gradient-to-r from-[#9b87f5] to-[#D946EF] hover:opacity-90 text-white shadow-[0_5px_15px_rgba(155,135,245,0.3)]">
+            <Button 
+              className="bg-gradient-to-r from-[#9b87f5] to-[#D946EF] hover:opacity-90 text-white shadow-[0_5px_15px_rgba(155,135,245,0.3)]"
+              onClick={handleCompleteSession}
+            >
               <Sparkles className="mr-2 h-4 w-4" />
               Complete Today's Meditation
             </Button>

@@ -1,17 +1,20 @@
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TreePine, Map, QrCode, Camera, Users, Upload } from "lucide-react";
+import { TreePine, Map, QrCode, Camera, Users, Upload, MapPin, MessageSquare } from "lucide-react";
 import { motion } from "framer-motion";
 import { useToast } from "@/components/ui/use-toast";
 import { auth, database } from "@/services/firebase";
-import { ref, onValue, update } from "firebase/database";
+import { ref, onValue, update, push, set } from "firebase/database";
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
 } from "recharts";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
 const treeData = [
   { month: 'Jan', trees: 12 },
@@ -56,12 +59,53 @@ const communityPosts = [
   }
 ];
 
+interface CommunityPost {
+  id: number;
+  user: string;
+  location: string;
+  date: string;
+  trees: number;
+  content: string;
+}
+
 export default function Forest() {
   const [activeTab, setActiveTab] = useState("tracking");
   const [userXp, setUserXp] = useState(0);
   const [treesPlanted, setTreesPlanted] = useState(0);
   const [xpProgress, setXpProgress] = useState(0);
-  const [totalTrees, setTotalTrees] = useState(0); // Add the missing totalTrees state
+  const [totalTrees, setTotalTrees] = useState(0);
+  const [showLocationDialog, setShowLocationDialog] = useState(false);
+  const [locationInput, setLocationInput] = useState("");
+  const [locationStatus, setLocationStatus] = useState<"idle" | "loading" | "error" | "manual">("idle");
+  const [showPostDialog, setShowPostDialog] = useState(false);
+  const [newPost, setNewPost] = useState({ content: "", location: "", trees: 1 });
+  const [communityPosts, setCommunityPosts] = useState<CommunityPost[]>([
+    {
+      id: 1,
+      user: "Priya M.",
+      location: "Mumbai, India",
+      date: "2 days ago",
+      trees: 3,
+      content: "Planted three neem trees at our local community garden today!"
+    },
+    {
+      id: 2,
+      user: "Rahul S.",
+      location: "Delhi, India",
+      date: "5 days ago",
+      trees: 2,
+      content: "Joined the school's eco-club plantation drive. Added two mango trees to our campus."
+    },
+    {
+      id: 3,
+      user: "Ananya K.",
+      location: "Bangalore, India",
+      date: "1 week ago",
+      trees: 5,
+      content: "Our neighborhood initiative's first milestone reached - 5 banyan trees planted along the street!"
+    }
+  ]);
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -80,7 +124,7 @@ export default function Forest() {
     const treesListener = onValue(treesRef, (snapshot) => {
       const trees = snapshot.val() || 0;
       setTreesPlanted(trees);
-      setTotalTrees(trees); // Set the totalTrees state when trees are loaded
+      setTotalTrees(trees);
     });
 
     return () => {
@@ -108,6 +152,52 @@ export default function Forest() {
       xp: newXp,
       treesPlanted: newTrees
     });
+  };
+
+  const handleShareLocation = () => {
+    setLocationStatus("loading");
+    setShowLocationDialog(true);
+    
+    setTimeout(() => {
+      setLocationStatus("error");
+      toast.error("Unable to access location services", {
+        description: "Free access limit to Google location services has been reached"
+      });
+    }, 2000);
+  };
+
+  const handleSubmitLocation = () => {
+    if (!locationInput.trim()) {
+      toast.error("Please enter a location");
+      return;
+    }
+    
+    setShowLocationDialog(false);
+    toast.success("Location verified!", {
+      description: `Location set to ${locationInput}`
+    });
+  };
+
+  const handleSubmitPost = () => {
+    if (!newPost.content.trim() || !newPost.location.trim()) {
+      toast.error("Please fill all required fields");
+      return;
+    }
+    
+    const post: CommunityPost = {
+      id: Date.now(),
+      user: auth.currentUser?.displayName || "Anonymous",
+      location: newPost.location,
+      date: "Just now",
+      trees: newPost.trees,
+      content: newPost.content
+    };
+    
+    setCommunityPosts([post, ...communityPosts]);
+    setNewPost({ content: "", location: "", trees: 1 });
+    setShowPostDialog(false);
+    
+    toast.success("Your planting story has been shared with the community!");
   };
 
   return (
@@ -297,16 +387,27 @@ export default function Forest() {
                 <Button 
                   variant="outline" 
                   className="border-[#0EA5E9] text-[#0EA5E9] hover:bg-[#0EA5E9]/10"
+                  onClick={handleShareLocation}
                 >
                   <Map className="mr-2 h-4 w-4" /> Share Location
                 </Button>
+              </div>
+              
+              <div className="mt-10 p-4 bg-[#7FB069]/10 rounded-lg">
+                <p className="text-[#1E40AF]/80 text-sm">
+                  <strong>Important:</strong> When your target of 200 XP is completed, the company will plant a tree of your name in your local area. 
+                  Then upload the photo of your planted tree here for verification.
+                </p>
               </div>
             </Card>
           </TabsContent>
           
           <TabsContent value="community">
             <div className="mb-6">
-              <Button className="bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 w-full">
+              <Button 
+                className="bg-[#0EA5E9] hover:bg-[#0EA5E9]/90 w-full"
+                onClick={() => setShowPostDialog(true)}
+              >
                 <TreePine className="mr-2 h-4 w-4" /> Share Your Planting Story
               </Button>
             </div>
@@ -347,6 +448,140 @@ export default function Forest() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <Dialog open={showLocationDialog} onOpenChange={setShowLocationDialog}>
+        <DialogContent className="bg-white/95 backdrop-blur-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <MapPin className="h-5 w-5 mr-2 text-[#0EA5E9]" />
+              Share Your Location
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {locationStatus === "loading" ? (
+              <div className="text-center p-4">
+                <motion.div
+                  className="h-10 w-10 rounded-full border-4 border-t-[#0EA5E9] border-r-transparent border-b-transparent border-l-transparent mx-auto"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+                <p className="mt-3 text-[#1E40AF]/70">
+                  Accessing your location...
+                </p>
+              </div>
+            ) : locationStatus === "error" ? (
+              <div className="space-y-4">
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-700 text-sm">
+                  The free access limit to Google location services has been reached. Please enter your location manually.
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-[#1E40AF]">
+                    Enter your location manually:
+                  </label>
+                  <Input
+                    placeholder="e.g., Mumbai, India"
+                    value={locationInput}
+                    onChange={(e) => setLocationInput(e.target.value)}
+                  />
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-[#1E40AF]">
+                  Enter your location:
+                </label>
+                <Input
+                  placeholder="e.g., Mumbai, India"
+                  value={locationInput}
+                  onChange={(e) => setLocationInput(e.target.value)}
+                />
+              </div>
+            )}
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline"
+              onClick={() => setShowLocationDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="bg-[#0EA5E9]"
+              onClick={handleSubmitLocation}
+              disabled={!locationInput.trim()}
+            >
+              Confirm Location
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      <Dialog open={showPostDialog} onOpenChange={setShowPostDialog}>
+        <DialogContent className="bg-white/95 backdrop-blur-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center">
+              <MessageSquare className="h-5 w-5 mr-2 text-[#0EA5E9]" />
+              Share Your Planting Story
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#1E40AF]">
+                Your story:
+              </label>
+              <Textarea
+                placeholder="Tell your tree planting experience..."
+                value={newPost.content}
+                onChange={(e) => setNewPost({...newPost, content: e.target.value})}
+                rows={4}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#1E40AF]">
+                Location:
+              </label>
+              <Input
+                placeholder="e.g., Mumbai, India"
+                value={newPost.location}
+                onChange={(e) => setNewPost({...newPost, location: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-[#1E40AF]">
+                Number of trees planted:
+              </label>
+              <Input
+                type="number"
+                min="1"
+                max="100"
+                value={newPost.trees}
+                onChange={(e) => setNewPost({...newPost, trees: parseInt(e.target.value) || 1})}
+              />
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button 
+              variant="outline"
+              onClick={() => setShowPostDialog(false)}
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="bg-[#0EA5E9]"
+              onClick={handleSubmitPost}
+            >
+              Share Story
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

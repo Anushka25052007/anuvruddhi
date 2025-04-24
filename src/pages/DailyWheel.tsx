@@ -4,15 +4,19 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Sparkles, Bird, Star, Heart } from "lucide-react";
+import { Sparkles, Bird, Star, Heart, Brain } from "lucide-react";
 import { ParticleEffect } from "@/components/motivation/ParticleEffect";
 import { ForestWheel } from "@/components/motivation/ForestWheel";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function DailyWheel() {
   const [intention, setIntention] = useState("");
   const [isSpinning, setIsSpinning] = useState(false);
   const [selectedReward, setSelectedReward] = useState<string | null>(null);
   const [spinCount, setSpinCount] = useState(0);
+  const [aiAdvice, setAiAdvice] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSpin = () => {
     if (isSpinning) return;
@@ -35,6 +39,14 @@ export default function DailyWheel() {
       toast.success(`You received: ${reward}`, {
         description: "May this gift guide your journey today",
       });
+      
+      // Show AI advice if intention is set
+      if (intention.trim()) {
+        setIsLoading(true);
+        setTimeout(() => {
+          generateAIAdvice(intention);
+        }, 500);
+      }
     }, 3000);
   };
 
@@ -45,6 +57,26 @@ export default function DailyWheel() {
     toast.success("Daily intention set!", {
       description: "Your focus word will guide your path today",
     });
+  };
+  
+  const generateAIAdvice = (userIntention: string) => {
+    // Simulate AI advice generation (in a real app, this would call an API)
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      const adviceOptions = [
+        `For your intention to '${userIntention}', try breaking it down into 3 small actions you can take today. Start with just 5 minutes of focused effort.`,
+        `To achieve '${userIntention}', consider creating a visual reminder of your goal somewhere you'll see it frequently throughout the day.`,
+        `Your goal to '${userIntention}' is admirable! Try pairing this new habit with something you already do daily to build consistency.`,
+        `For '${userIntention}', consider finding an accountability partner who shares a similar goal. Schedule weekly check-ins to share progress.`,
+        `To make progress on '${userIntention}', set a specific time each day dedicated solely to this intention. Even 10 minutes of consistent effort will compound over time.`
+      ];
+      
+      const selectedAdvice = adviceOptions[Math.floor(Math.random() * adviceOptions.length)];
+      setAiAdvice(selectedAdvice);
+      setIsLoading(false);
+      setIsDialogOpen(true);
+    }, 1500);
   };
 
   return (
@@ -162,6 +194,44 @@ export default function DailyWheel() {
           )}
         </div>
       </div>
+
+      {/* AI Advice Dialog */}
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent className="bg-white/95 backdrop-blur-md border border-[#9b87f5]/30">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-[#5D4E7B]">
+              <Brain className="mr-2 h-5 w-5 text-[#D946EF]" />
+              Wisdom Guide for Your Intention
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="py-4">
+            {isLoading ? (
+              <div className="flex flex-col items-center justify-center p-4">
+                <motion.div
+                  className="h-12 w-12 rounded-full border-4 border-t-[#9b87f5] border-r-transparent border-b-transparent border-l-transparent"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+                <p className="mt-4 text-[#5D4E7B]">Consulting the wisdom oracle...</p>
+              </div>
+            ) : (
+              <div className="p-4 bg-[#9b87f5]/10 rounded-lg">
+                <p className="text-[#5D4E7B] leading-relaxed">{aiAdvice}</p>
+                <div className="mt-4 text-sm text-[#5D4E7B]/70 italic">
+                  Take small consistent steps toward your intention today.
+                </div>
+              </div>
+            )}
+          </div>
+          
+          <div className="flex justify-end">
+            <Button onClick={() => setIsDialogOpen(false)} className="bg-gradient-to-r from-[#9b87f5] to-[#D946EF]">
+              Apply This Wisdom
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

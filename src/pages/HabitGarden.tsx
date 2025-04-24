@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Card } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HabitPlant } from "@/components/habits/HabitPlant";
 import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { CustomHabits } from "@/components/habits/CustomHabits";
-import { Leaf, Check, Sparkles, Star } from "lucide-react";
+import { Leaf, Check, Sparkles, Star, Book, Droplet, House, AlarmClock, Water } from "lucide-react";
 
 // Example habits data with colors
 const plantableHabits = [
@@ -15,6 +14,25 @@ const plantableHabits = [
   { id: 3, name: "Compost Food Waste", xp: 15, completed: false, color: "#D946EF" },
   { id: 4, name: "Use Public Transport", xp: 30, completed: false, color: "#F97316" },
   { id: 5, name: "Conserve Electricity", xp: 25, completed: false, color: "#9b87f5" },
+  { id: 6, name: "Read Books", xp: 35, completed: false, color: "#D946EF" },
+  { id: 7, name: "Drink More Water", xp: 20, completed: false, color: "#33C3F0" },
+  { id: 8, name: "Do Household Work", xp: 30, completed: false, color: "#FEC6A1" },
+  { id: 9, name: "Save Water While Bathing", xp: 25, completed: false, color: "#1EAEDB" },
+  { id: 10, name: "Wake Up Early", xp: 40, completed: false, color: "#F97316" },
+];
+
+// Updated categories with icons for new habits
+const categories = [
+  { name: "mindfulness", icon: Star },
+  { name: "sleep", icon: AlarmClock },
+  { name: "focus", icon: Sparkles },
+  { name: "anxiety", icon: Leaf },
+  { name: "nature", icon: Leaf },
+  { name: "spiritual", icon: Star },
+  { name: "reading", icon: Book },
+  { name: "hydration", icon: Droplet },
+  { name: "household", icon: House },
+  { name: "water-saving", icon: Water },
 ];
 
 export default function HabitGarden() {
