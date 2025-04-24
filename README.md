@@ -100,6 +100,9 @@ You can find my lovable prompt logic here:
      -  Backend: Firebase
      -  Real-time rewards: Telegram Bot
       ----
+
+        ## Demo Video
+        Due to time and technical limitations, the video demo is not included, but all features can be explored using the above app link. Screenshots below provide full visibility of app functionality. but the app is "Still under development " 
         
 ** Sign up Page ** ** Your Daily Journey ** ** Wisdom Wheel of Fortune **
  <img src="img 1.png" width="250"/>  <img src="img2.png" width="250"/>  <img src="img3.png" width="250"/>  <img src="img4.png" width="350"/> ** Your Habit Garden ** <img src="img5.png" width="350"/> ** Temple of You ** <img src="img6.png" width="350"/> ** Meditation Space ** <img src="img7.png" width="350"/>  ** Exercise Hub ** <img src="img8.png" width="350"/> ** Study Space ** <img src="img9.png" width="350"/> ** My Growing Forest ** <img src="img10.png" width="350"/>  ** Certificates ** 
