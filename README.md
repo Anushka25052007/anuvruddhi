@@ -1,4 +1,4 @@
-# Welcome to your Lovable project
+# Welcome to ANUVRUDDHI (Meaning =" Sustainable growth ")  by Anushka
 
 <img src="app_icon.jpg" alt="Anuvruddhi App Icon" width="120"/>
 Flourish with Nature. Rise with purpose.
