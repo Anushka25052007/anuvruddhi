@@ -99,8 +99,9 @@ You can find my lovable prompt logic here:
      -  Core Logic prompts : Written & executed in lovable
      -  Backend: Firebase
      -  Real-time rewards: Telegram Bot
-** Sign up Page **
- <img src="img1.png" width="250"/> ** Your Daily Journey ** <img src="img2.png" width="250"/> ** Wisdom Wheel of Fortune ** <img src="img3.png" width="250"/> ** Your Habit Garden ** <img src="img4.png" width="350"/> ** Temple of You ** <img src="img5.png" width="350"/> ** Meditation Space ** <img src="img6.png" width="350"/> ** Exercise Hub ** <img src="img7.png" width="350"/> ** Study Space ** <img src="img8.png" width="350"/> ** My Growing Forest ** <img src="img9.png" width="350"/> ** Certificates ** 
+      ----
+** Sign up Page ** ** Your Daily Journey ** 
+ <img src="img1.png" width="250"/>  <img src="img2.png" width="250"/> ** Wisdom Wheel of Fortune ** <img src="img3.png" width="250"/> ** Your Habit Garden ** <img src="img4.png" width="350"/> ** Temple of You ** <img src="img5.png" width="350"/> ** Meditation Space ** <img src="img6.png" width="350"/> ** Exercise Hub ** <img src="img7.png" width="350"/> ** Study Space ** <img src="img8.png" width="350"/> ** My Growing Forest ** <img src="img9.png" width="350"/> ** Certificates ** 
  <img src="img10.png" width="350"/> 
        --
   ##     Developed by
