@@ -5,7 +5,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { HabitPlant } from "@/components/habits/HabitPlant";
 import { DailyRitualCircle } from "@/components/habits/DailyRitualCircle";
 import { CustomHabits } from "@/components/habits/CustomHabits";
-import { Leaf, Check, Sparkles, Star, Book, Droplet, House, AlarmClock, Water } from "lucide-react";
+import { Leaf, Check, Sparkles, Star, Book, Droplet, House, AlarmClock, Waves } from "lucide-react";
 
 // Example habits data with colors
 const plantableHabits = [
@@ -32,7 +32,7 @@ const categories = [
   { name: "reading", icon: Book },
   { name: "hydration", icon: Droplet },
   { name: "household", icon: House },
-  { name: "water-saving", icon: Water },
+  { name: "water-saving", icon: Waves },
 ];
 
 export default function HabitGarden() {

@@ -160,7 +160,9 @@ export default function Forest() {
     
     setTimeout(() => {
       setLocationStatus("error");
-      toast.error("Unable to access location services", {
+      toast({
+        variant: "destructive",
+        title: "Unable to access location services",
         description: "Free access limit to Google location services has been reached"
       });
     }, 2000);
@@ -168,19 +170,28 @@ export default function Forest() {
 
   const handleSubmitLocation = () => {
     if (!locationInput.trim()) {
-      toast.error("Please enter a location");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please enter a location"
+      });
       return;
     }
     
     setShowLocationDialog(false);
-    toast.success("Location verified!", {
+    toast({
+      title: "Location verified!",
       description: `Location set to ${locationInput}`
     });
   };
 
   const handleSubmitPost = () => {
     if (!newPost.content.trim() || !newPost.location.trim()) {
-      toast.error("Please fill all required fields");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please fill all required fields"
+      });
       return;
     }
     
@@ -197,7 +208,10 @@ export default function Forest() {
     setNewPost({ content: "", location: "", trees: 1 });
     setShowPostDialog(false);
     
-    toast.success("Your planting story has been shared with the community!");
+    toast({
+      title: "Success!",
+      description: "Your planting story has been shared with the community!"
+    });
   };
 
   return (

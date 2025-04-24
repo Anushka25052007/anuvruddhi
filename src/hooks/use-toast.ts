@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import type {
@@ -167,6 +168,24 @@ function toast({ ...props }: Toast) {
     update,
   }
 }
+
+// Helper functions for common toast types
+toast.success = (title: string, { description, ...props }: Partial<Toast> = {}) => {
+  return toast({
+    title,
+    description,
+    ...props,
+  });
+};
+
+toast.error = (title: string, { description, ...props }: Partial<Toast> = {}) => {
+  return toast({
+    title,
+    description,
+    variant: "destructive",
+    ...props,
+  });
+};
 
 function useToast() {
   const [state, setState] = React.useState<State>(memoryState)
