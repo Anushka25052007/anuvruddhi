@@ -100,15 +100,11 @@ You can find my lovable prompt logic here:
      -  Backend: Firebase
      -  Real-time rewards: Telegram Bot
       ----
-** Sign up Page ** ** Your Daily Journey ** 
- <img src="img1.png" width="250"/>  <img src="img2.png" width="250"/> ** Wisdom Wheel of Fortune ** <img src="img3.png" width="250"/> ** Your Habit Garden ** <img src="img4.png" width="350"/> ** Temple of You ** <img src="img5.png" width="350"/> ** Meditation Space ** <img src="img6.png" width="350"/> ** Exercise Hub ** <img src="img7.png" width="350"/> ** Study Space ** <img src="img8.png" width="350"/> ** My Growing Forest ** <img src="img9.png" width="350"/> ** Certificates ** 
- <img src="img10.png" width="350"/> 
+        
+** Sign up Page ** ** Your Daily Journey ** ** Wisdom Wheel of Fortune **
+ <img src="img1.png" width="250"/>  <img src="img2.png" width="250"/>  <img src="img3.png" width="250"/>  <img src="img4.png" width="350"/> ** Your Habit Garden ** <img src="img5.png" width="350"/> ** Temple of You ** <img src="img6.png" width="350"/> ** Meditation Space ** <img src="img7.png" width="350"/>  ** Exercise Hub ** <img src="img8.png" width="350"/> ** Study Space ** <img src="img9.png" width="350"/> ** My Growing Forest ** <img src="img10.png" width="350"/>  ** Certificates ** 
        --
   ##     Developed by
      ** Anushka Sarode **
   First Year Engineering Student
   * National Hackathon Submission 2025 *
-
-  ##   Author
-  Anushka Sarode - First Year Engineering Student
-  * Hackathon Submission | 2025* 
