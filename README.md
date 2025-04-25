@@ -21,6 +21,13 @@ This project is built with:
 #  Anuvruddhi - Flourish with Nature. Rise with Purpose.
 ** Anuvruddhi ** is a gamified life-growth and eco-conscious app that empowers users to evolve mentally, emotionally, and spiritually through daily mindful actions - while giving back to the planet through tree planting, gratitude rituals, and soul-based tasks.
 
+----
+> ** Note: **
+>  This project was built before the hackathon using lovable.dev (now locked) from 13 april. 2025 because i dont know that hackthons wants real time work, which can be done in a particular time limit, so I'm submitting it just to share the idea, not for prizes.
+> I'd truly appreciate any feedback or even a small comment at ** anushkasarode45@gmail.com ** .
+> If allowed, I would also be grateful to receive a ** participation certificate ** .
+> Thank you !
+
 --
 ##    Project Vision 
 Anuvruddhi is not just an app - it's a movement to help individuals grow menatally, emotionally, and spiritually while also connecting deeply with nature. Our mission is to inspire meaningful action, personal reflection, and real-world impact through a gamified self-evolution journey.
