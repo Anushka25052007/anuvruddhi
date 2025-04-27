@@ -98,15 +98,15 @@ You can find my lovable prompt logic here:
  <img src="img 1.png" width="250"/>  <img src="img2.png" width="250"/>  <img src="img3.png" width="250"/>  <img src="img4.png" width="350"/> ** Your Habit Garden ** <img src="img5.png" width="350"/> ** Temple of You ** <img src="img6.png" width="350"/> ** Meditation Space ** <img src="img7.png" width="350"/>  ** Exercise Hub ** <img src="img8.png" width="350"/> ** Study Space ** <img src="img9.png" width="350"/> ** My Growing Forest ** <img src="img10.png" width="350"/>  ** Certificates ** 
        --
 
-        ##  Additional Project Resources
+## Additional Project Resources
 
-        All supporting documents related to Anuvruddhi are available here:
+  All supporting documents related to Anuvruddhi are available here:
         -  [A(project ppt).pptx](AdditionalResources/A(project_ppt).pptx)
         -  [B(task schedule).pptx](AdditionalResources/B(task_schedule).pptx)
         -  [C(Tools used).docx](AdditionalResources/C(Tools_used).docx)
         -  [D( git-hub link, app link, summary).docx](AdditionalResources/D(git-hub_link,_app_link,_summary).docx)
 
-      Please refer to these files for a deeper understanding of the project planning, tools utilized, and execution timeline.
+  Please refer to these files for a deeper understanding of the project planning, tools utilized, and execution timeline.
       ---
   ##     Developed by
      ** Anushka Sarode **
