@@ -97,6 +97,17 @@ You can find my lovable prompt logic here:
 ** Sign up Page ** ** Your Daily Journey ** ** Wisdom Wheel of Fortune **
  <img src="img 1.png" width="250"/>  <img src="img2.png" width="250"/>  <img src="img3.png" width="250"/>  <img src="img4.png" width="350"/> ** Your Habit Garden ** <img src="img5.png" width="350"/> ** Temple of You ** <img src="img6.png" width="350"/> ** Meditation Space ** <img src="img7.png" width="350"/>  ** Exercise Hub ** <img src="img8.png" width="350"/> ** Study Space ** <img src="img9.png" width="350"/> ** My Growing Forest ** <img src="img10.png" width="350"/>  ** Certificates ** 
        --
+
+        ##  Additional Project Resources
+
+        All supporting documents related to Anuvruddhi are available here:
+        -  [A(project ppt).pptx](AdditionalResources/Presentation-Anuvruddhi.pptx)
+        -  [B(task schedule).pptx](AdditionalResources/Task-Schedule.pptx)
+        -  [C(Tools used).docx](AdditionalResources/Tools-Used.docx)
+        -  [D( git-hub link, app link, summary).docx](AdditionalResources/Links-Summary.docx)
+
+      Please refer to these files for a deeper understanding of the project planning, tools utilized, and execution timeline.
+      ---
   ##     Developed by
      ** Anushka Sarode **
   First Year Engineering Student
