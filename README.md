@@ -101,10 +101,10 @@ You can find my lovable prompt logic here:
         ##  Additional Project Resources
 
         All supporting documents related to Anuvruddhi are available here:
-        -  [A(project ppt).pptx](AdditionalResources/A(project ppt).pptx)
-        -  [B(task schedule).pptx](AdditionalResources/B(task schedule).pptx)
-        -  [C(Tools used).docx](AdditionalResources/C(Tools used).docx)
-        -  [D( git-hub link, app link, summary).docx](AdditionalResources/D( git-hub link, app link, summary).docx)
+        -  [A(project ppt).pptx](AdditionalResources/A(project_ppt).pptx)
+        -  [B(task schedule).pptx](AdditionalResources/B(task_schedule).pptx)
+        -  [C(Tools used).docx](AdditionalResources/C(Tools_used).docx)
+        -  [D( git-hub link, app link, summary).docx](AdditionalResources/D(git-hub_link,_app_link,_summary).docx)
 
       Please refer to these files for a deeper understanding of the project planning, tools utilized, and execution timeline.
       ---
