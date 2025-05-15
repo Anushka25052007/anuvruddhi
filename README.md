@@ -3,10 +3,6 @@
 <img src="app_icon.jpg" alt="Anuvruddhi App Icon" width="120"/>
 Flourish with Nature. Rise with purpose.
 
-## Project info
-
-**URL**: https://lovable.dev/projects/2261b706-cbde-4a67-98bf-48bd75acff99
-
 ## What technologies are used for this project?
 
 This project is built with:
@@ -17,18 +13,11 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-
 #  Anuvruddhi - Flourish with Nature. Rise with Purpose.
 ** Anuvruddhi ** is a gamified life-growth and eco-conscious app that empowers users to evolve mentally, emotionally, and spiritually through daily mindful actions - while giving back to the planet through tree planting, gratitude rituals, and soul-based tasks.
 
 ----
-> ** Note: **
->  This project was built before the hackathon using lovable.dev (now locked) from 13 april. 2025 because i dont know that hackthons wants real time work, which can be done in a particular time limit, so I'm submitting it just to share the idea, not for prizes.
-> I'd truly appreciate any feedback or even a small comment at ** anushkasarode45@gmail.com ** .
-> If allowed, I would also be grateful to receive a ** participation certificate ** .
-> Thank you !
 
---
 ##    Project Vision 
 Anuvruddhi is not just an app - it's a movement to help individuals grow menatally, emotionally, and spiritually while also connecting deeply with nature. Our mission is to inspire meaningful action, personal reflection, and real-world impact through a gamified self-evolution journey.
 
@@ -91,9 +80,6 @@ You can find my lovable prompt logic here:
      -  Real-time rewards: Telegram Bot
       ----
 
-        ## Demo Video
-        Due to time and technical limitations, the video demo is not included, but all features can be explored using the above app link. Screenshots below provide full visibility of app functionality. but the app is "Still under development " 
-        
 ** Sign up Page ** ** Your Daily Journey ** ** Wisdom Wheel of Fortune **
  <img src="img 1.png" width="250"/>  <img src="img2.png" width="250"/>  <img src="img3.png" width="250"/>  <img src="img4.png" width="350"/> ** Your Habit Garden ** <img src="img5.png" width="350"/> ** Temple of You ** <img src="img6.png" width="350"/> ** Meditation Space ** <img src="img7.png" width="350"/>  ** Exercise Hub ** <img src="img8.png" width="350"/> ** Study Space ** <img src="img9.png" width="350"/> ** My Growing Forest ** <img src="img10.png" width="350"/>  ** Certificates ** 
        --
@@ -112,3 +98,7 @@ You can find my lovable prompt logic here:
      ** Anushka Sarode **
   First Year Engineering Student
   * National Hackathon Submission 2025 *
+
+> Note: The live version is not shared publicly to protect the prototype.
+> This project was built for the Life Quest Hackathon 2025 using a no-code platform.
+> For a demo or pitch, feel free to reach out.
